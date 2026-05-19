@@ -7,7 +7,7 @@
 Self-hosted autonomous AI agent. Plans, executes, and improves itself running on infrastructure you own.
 
 [![License: BSL 1.1](https://img.shields.io/badge/License-BSL%201.1-F5C542?style=flat-square)](LICENSE.md)
-[![Version](https://img.shields.io/badge/version-2.7-F5C542?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.7.1-F5C542?style=flat-square)](CHANGELOG.md)
 [![Docs](https://img.shields.io/badge/docs-agentwasp.com-F5C542?style=flat-square)](https://docs.agentwasp.com)
 [![Install](https://img.shields.io/badge/install-1%20line-F5C542?style=flat-square)](#install)
 [![Python](https://img.shields.io/badge/python-3.12-F5C542?style=flat-square)](https://www.python.org)

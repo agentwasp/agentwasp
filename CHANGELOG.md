@@ -5,6 +5,43 @@ All notable changes to WASP are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions: [SemVer](https://semver.org/). Full pre-OSS history (v2.3 → v2.6) lives at https://docs.agentwasp.com/changelog — the entries below cover the public-release work on top of that baseline.
 
+## [2.7.1] — 2026-05-19 (security patch release)
+
+Security-focused patch release. Closes a security audit reported by [@Lucky3mc](https://github.com/Lucky3mc) using the 9-engine Debuggix scan, plus the post-launch hardening commits that landed between the v2.7 tag and this release.
+
+### ⚠️ Breaking change for VPS installs
+
+The dashboard host port is now bound to `127.0.0.1` by default (issue #4). v2.7 installs that accessed the dashboard at `http://VPS-IP:8080` will lose remote access after running `wasp update`. Choose one of:
+
+1. SSH tunnel: `ssh -L 8080:127.0.0.1:8080 user@vps`, then open `http://localhost:8080` on your local machine.
+2. Put a reverse proxy with TLS in front (nginx, Caddy, Traefik) and have it talk to `127.0.0.1:8080`.
+3. Explicitly opt back in by setting `DASHBOARD_BIND=0.0.0.0` in `.env` (only after option 2 is in place).
+
+### Security
+
+- **Path traversal in media handling** (#2, PR #6). Four model providers (`anthropic_provider.py`, `google_provider.py`, `ollama_provider.py`, `openai_provider.py`) opened user-supplied image paths with `open(path, "rb")` and no validation. A crafted path like `../../etc/passwd` or `/etc/passwd` would be base64-encoded and sent to the LLM, a file-exfiltration primitive. The Whisper `audio_path` had the same bug in the same module. Fix: new helper `src/utils/path_safety.py::validate_media_path()` that realpath-resolves the input and rejects anything outside `/data/chat-uploads`, `/data/shared`, `/data/screenshots`, `/data/screenshot`.
+
+- **SQL identifier hardening** (#3, PR #7). Three call sites built raw SQL with f-strings interpolating identifiers (`metrics.py:109` bucket expression, `reset.py:339` table name, `integrity.py:283` table + column). Not exploitable today because the values come from hard-coded constants, but a fragile pattern. Each call site now validates against a strict allowlist (`frozenset` or `^[a-zA-Z_][a-zA-Z0-9_]*$`) before interpolation, so any future refactor wiring user input through these constants will fail loudly rather than silently enable SQL injection.
+
+- **Dashboard bound to all host interfaces by default** (#4, PR #9). `docker-compose.yml` mapped port 8080 to `0.0.0.0` and `install.sh` ran `ufw allow 8080/tcp` on hosts with UFW, exposing the dashboard publicly without TLS or fronting on a default VPS install. The original report suggested changing `config.py:48` (the in-container bind), but that would break the operator's reverse-proxy deployment; the real surface was the host port mapping. Fix: `docker-compose.yml` now maps to `${DASHBOARD_BIND:-127.0.0.1}`, `install.sh` only adds the UFW rule when `DASHBOARD_BIND=0.0.0.0` is explicitly set, and the post-install summary shows a copy-paste SSH-tunnel command for remote access.
+
+- **docs-site dependency CVEs** (#5, PR #8). `npm audit` reported 38 vulnerabilities (8 moderate, 30 high) in the docs-site, covering lodash, fast-uri, DOMPurify, Mermaid, picomatch, path-to-regexp, follow-redirects, brace-expansion, ws, webpack-dev-server, uuid, `@babel/plugin-transform-modules-systemjs`, serialize-javascript (transitively), and several other packages. Fix: Docusaurus bumped from 3.9.2 to 3.10.1, `@docusaurus/faster` added as an explicit dependency (required by Docusaurus 3.10 when `future.v4` is enabled), and an `overrides` block pins `serialize-javascript` to `^7.0.5`. Audit is now clean (0 vulnerabilities); build succeeds; `https://docs.agentwasp.com/` serves the new build.
+
+### Fixed (between v2.7 and v2.7.1)
+
+- **Installer on macOS** (#1). Pre-flight checks now branch on `$PKG_FAMILY`: `sysctl hw.memsize` instead of `/proc/meminfo`, `df -g` instead of `df -BG`, `lsof` instead of `ss`, skip `usermod` on Darwin. `OS_ID` defaults to `"macos"` instead of `"unknown"`.
+- **PowerShell installer logo rendering** on Windows. Replaced misaligned ASCII art with ANSI Shadow Unicode blocks matching `install.sh`. Forced UTF-8 console output so box-drawing characters render.
+
+### Added (between v2.7 and v2.7.1)
+
+- **Published installer SHA-256 checksums**: `install.sh.sha256` and `install.ps1.sha256` are now served from `agentwasp.com`. README documents a verify-before-pipe flow (`curl ... .sha256 | sha256sum -c -`).
+- **Official contact email**: `lab@agentwasp.com` (in README, SECURITY.md, CODE_OF_CONDUCT).
+- **Discord community link** on the landing page (https://discord.gg/DCxTeVtTjg).
+
+### Removed (between v2.7 and v2.7.1)
+
+- **Operator-only `containers/agent-nginx/`** from the public source tree. It was the production landing-page container for `agentwasp.com`, not part of the agent runtime. Public installs do not need it.
+
 ## [2.7] — 2026-05-13 (first public OSS release)
 
 ### Fixed

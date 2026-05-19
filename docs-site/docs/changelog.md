@@ -10,6 +10,36 @@ All notable changes to WASP are documented here. Versions follow a semantic vers
 
 ---
 
+## v2.7.1 — May 19, 2026
+
+**Focus: Security patch release. Four issues from an external 9-engine security audit ([@Lucky3mc](https://github.com/Lucky3mc) via Debuggix), plus the post-launch hardening commits that landed between the v2.7 tag and this release.**
+
+### ⚠️ Breaking change for VPS installs
+
+The dashboard host port is now bound to `127.0.0.1` by default. v2.7 installs that accessed the dashboard at `http://VPS-IP:8080` lose remote access after `wasp update`. Migration options:
+
+1. SSH tunnel: `ssh -L 8080:127.0.0.1:8080 user@vps`, then open `http://localhost:8080` locally.
+2. Reverse proxy with TLS (nginx, Caddy, Traefik) pointing at `127.0.0.1:8080`.
+3. `DASHBOARD_BIND=0.0.0.0` in `.env` to opt back in (only after option 2 is in place).
+
+### Security fixes
+
+- **#2 / PR #6**: Path traversal in `image_path` and `audio_path` parameters across four model providers. Crafted paths could exfiltrate arbitrary files readable by the container process to the LLM provider. New helper `src/utils/path_safety.py::validate_media_path()` realpath-resolves inputs and rejects anything outside the legitimate media dirs.
+- **#3 / PR #7**: SQL identifier interpolation hardening in `metrics.py`, `reset.py`, `integrity.py`. Not exploitable today (values come from constants), but each call site now explicitly validates against an allowlist or strict identifier regex before interpolation.
+- **#4 / PR #9**: Dashboard exposed publicly by default. `docker-compose.yml` now binds to `${DASHBOARD_BIND:-127.0.0.1}` and `install.sh` only opens UFW port 8080 on explicit opt-in.
+- **#5 / PR #8**: 38 vulnerabilities in docs-site dependencies (lodash, fast-uri, DOMPurify, Mermaid, serialize-javascript, and more). Docusaurus bumped 3.9.2 → 3.10.1, `serialize-javascript` overridden to `^7.0.5`, `@docusaurus/faster` added. Audit now clean.
+
+### Post-launch fixes shipped in v2.7.1
+
+- **#1**: Installer on macOS. Pre-flight checks branch on `$PKG_FAMILY`.
+- **PowerShell installer logo**: replaced misaligned ASCII with ANSI Shadow Unicode blocks, forced UTF-8 console output.
+- **Published installer SHA-256 checksums** at `https://agentwasp.com/install.sh.sha256` and `/install.ps1.sha256` for verify-before-pipe.
+- **Official contact email**: `lab@agentwasp.com`.
+- **Discord community link** on the landing page.
+- **Removed `containers/agent-nginx/`** from the public source tree (operator-only landing-page container, not part of the agent runtime).
+
+---
+
 ## v2.7 — May 13, 2026
 
 **Focus: First public OSS release — installer, packaging hygiene, cross-distro validation, dashboard UX bug fixes, security hardening.**

@@ -8,7 +8,7 @@ description: Completed features and planned improvements for WASP.
 
 ## Current Status
 
-**Current Version: v2.7** (May 2026 — first public OSS release)
+**Current Version: v2.7.1** (May 2026 — security patch on top of v2.7, the first public OSS release)
 
 WASP is in active production deployment and now publishable as a self-hostable OSS project. All systems below are complete and operational.
 
