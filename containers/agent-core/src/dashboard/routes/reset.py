@@ -334,7 +334,16 @@ async def reset_execute(request: Request):
         db_errors: list[str] = []
         try:
             async with async_session() as session:
+                # Defense-in-depth: _TRUNCATE_TABLES is a module-level constant,
+                # but we re-check each entry against a strict identifier regex
+                # so any future code that mutates the list (or wires user input
+                # into it) fails loudly instead of enabling SQL injection.
+                import re as _re_ident
+                _SAFE_IDENT = _re_ident.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")
                 for table in _TRUNCATE_TABLES:
+                    if not _SAFE_IDENT.match(table):
+                        db_errors.append(f"{table}: rejected (unsafe identifier)")
+                        continue
                     try:
                         await session.execute(text(f"DELETE FROM {table}"))
                         truncated.append(table)

@@ -102,6 +102,17 @@ async def metrics_trend(
         n_buckets = 30
         delta = timedelta(days=1)
 
+    # Defense-in-depth: bucket_sql is set above from a hard-coded if/elif chain
+    # and is never user-controlled. Re-validate before interpolating into raw
+    # SQL so any future refactor that introduces user input will fail loudly
+    # rather than silently enable SQL injection.
+    _ALLOWED_BUCKET_EXPRS = frozenset({
+        "date_trunc('hour', timestamp)",
+        "date_trunc('day', timestamp)",
+    })
+    if bucket_sql not in _ALLOWED_BUCKET_EXPRS:
+        raise ValueError(f"invalid bucket expression: {bucket_sql!r}")
+
     try:
         async with async_session() as session:
             rows = await session.execute(

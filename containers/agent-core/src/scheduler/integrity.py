@@ -276,7 +276,16 @@ class SelfIntegrityMonitorJob:
         # Each table gets its OWN session — a failure on one table (e.g. it
         # doesn't exist on this install, or its column was renamed) must not
         # poison the connection for the rest.
+        # Defense-in-depth: DB_TABLES is hard-coded above but we re-check each
+        # identifier against a strict regex so a future refactor wiring user
+        # input here fails loudly instead of enabling SQL injection.
+        import re as _re_ident
+        _SAFE_IDENT = _re_ident.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")
         for table, system_name, ts_col in DB_TABLES:
+            if not _SAFE_IDENT.match(table) or not _SAFE_IDENT.match(ts_col):
+                logger.warning("integrity.unsafe_identifier_skipped",
+                               table=table, ts_col=ts_col)
+                continue
             try:
                 async with async_session() as session:
                     result = await session.execute(text(
