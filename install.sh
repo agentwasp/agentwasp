@@ -552,9 +552,16 @@ step "Build & start"
 if $NO_START; then
     warn "--no-start set: skipping docker build and service start"
 else
-    # Open dashboard port in UFW if active (common cause of timeout)
-    if command -v ufw >/dev/null 2>&1 && $SUDO ufw status 2>/dev/null | grep -q "Status: active"; then
-        info "UFW firewall is active — opening port 8080 for dashboard"
+    # Open dashboard port in UFW only when the host binding is public.
+    # The default bind is 127.0.0.1 (loopback only), in which case no
+    # firewall rule is needed and opening 8080 would needlessly increase
+    # the host's exposed-port surface.
+    DASHBOARD_BIND_VAL="$(grep -E '^DASHBOARD_BIND=' "${INSTALL_DIR}/.env" 2>/dev/null | cut -d= -f2)"
+    DASHBOARD_BIND_VAL="${DASHBOARD_BIND_VAL:-127.0.0.1}"
+    if [[ "$DASHBOARD_BIND_VAL" == "0.0.0.0" ]] && \
+       command -v ufw >/dev/null 2>&1 && \
+       $SUDO ufw status 2>/dev/null | grep -q "Status: active"; then
+        info "UFW firewall is active and DASHBOARD_BIND=0.0.0.0, opening port 8080"
         $SUDO ufw allow 8080/tcp >/dev/null 2>&1 || true
         ok "Port 8080 allowed in UFW"
     fi
@@ -609,18 +616,27 @@ fi
 hr
 ok "${C_BOLD}🚀  WASP is installed${C_RESET}"
 DASH_PORT=8080
-# `hostname -I` is GNU-only (BusyBox/Alpine returns non-zero and an unhelpful
-# error). Fall back to `ip` then `localhost` so the install never aborts in
-# the final summary just to print a URL.
-HOST_IP=""
-if command -v hostname >/dev/null 2>&1; then
-    HOST_IP="$(hostname -I 2>/dev/null | awk '{print $1}')" || HOST_IP=""
+# Read the host bind from .env to decide which URL to show. The default
+# install binds the dashboard to 127.0.0.1 (loopback) for safety.
+DASH_BIND="$(grep -E '^DASHBOARD_BIND=' "${INSTALL_DIR}/.env" 2>/dev/null | cut -d= -f2)"
+DASH_BIND="${DASH_BIND:-127.0.0.1}"
+
+if [[ "$DASH_BIND" == "0.0.0.0" ]]; then
+    # Public bind. Compute a routable host IP for the summary line.
+    HOST_IP=""
+    if command -v hostname >/dev/null 2>&1; then
+        HOST_IP="$(hostname -I 2>/dev/null | awk '{print $1}')" || HOST_IP=""
+    fi
+    if [[ -z "$HOST_IP" ]] && command -v ip >/dev/null 2>&1; then
+        HOST_IP="$(ip -4 -o route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i==\"src\"){print $(i+1); exit}}')" || HOST_IP=""
+    fi
+    [[ -z "$HOST_IP" ]] && HOST_IP="localhost"
+    DASH_URL="http://${HOST_IP}:${DASH_PORT}"
+else
+    # Loopback bind (default). The dashboard is reachable only from this host.
+    DASH_URL="http://127.0.0.1:${DASH_PORT}"
 fi
-if [[ -z "$HOST_IP" ]] && command -v ip >/dev/null 2>&1; then
-    HOST_IP="$(ip -4 -o route get 1.1.1.1 2>/dev/null | awk '{for(i=1;i<=NF;i++) if($i==\"src\"){print $(i+1); exit}}')" || HOST_IP=""
-fi
-[[ -z "$HOST_IP" ]] && HOST_IP="localhost"
-DASH_URL="http://${HOST_IP}:${DASH_PORT}"
+
 log ""
 log "  ${C_BOLD}📊  Dashboard:${C_RESET}    ${C_CYAN}${DASH_URL}${C_RESET}"
 log "  ${C_BOLD}📁  Install dir:${C_RESET}  ${INSTALL_DIR}"
@@ -633,4 +649,14 @@ log "  1. Open the dashboard: ${C_CYAN}${DASH_URL}${C_RESET}"
 log "  2. ${C_BOLD}wasp status${C_RESET}    see container states"
 log "  3. ${C_BOLD}wasp logs${C_RESET}      stream live logs"
 log "  4. ${C_BOLD}wasp health${C_RESET}    re-run health probes"
+if [[ "$DASH_BIND" != "0.0.0.0" ]]; then
+    log ""
+    log "${C_DIM}Accessing the dashboard remotely:${C_RESET}"
+    log "  The dashboard is bound to 127.0.0.1 for safety. To reach it from"
+    log "  another machine, either SSH-tunnel:"
+    log "    ${C_BOLD}ssh -L ${DASH_PORT}:127.0.0.1:${DASH_PORT} user@this-host${C_RESET}"
+    log "    then open http://localhost:${DASH_PORT} on your local machine,"
+    log "  or put a TLS reverse proxy (nginx / Caddy / traefik) in front."
+    log "  Only set DASHBOARD_BIND=0.0.0.0 in .env after that is in place."
+fi
 hr

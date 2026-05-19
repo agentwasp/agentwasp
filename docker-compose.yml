@@ -52,7 +52,12 @@ services:
       agent-postgres:
         condition: service_healthy
     ports:
-      - "${DASHBOARD_PORT:-8080}:8080"
+      # Dashboard host port binding. Defaults to 127.0.0.1 so the dashboard is
+      # only reachable from the same machine. To expose it publicly (e.g.
+      # behind your own TLS reverse proxy), set DASHBOARD_BIND=0.0.0.0 in
+      # .env, and only after putting a reverse proxy with TLS + auth in
+      # front of it. See docs/SECURITY.md.
+      - "${DASHBOARD_BIND:-127.0.0.1}:${DASHBOARD_PORT:-8080}:8080"
     environment:
       REDIS_URL: redis://agent-redis:6379/0
       DATABASE_URL: postgresql+asyncpg://agent:${POSTGRES_PASSWORD}@agent-postgres:5432/agent
