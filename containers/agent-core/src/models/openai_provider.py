@@ -7,6 +7,7 @@ import structlog
 
 from .base import LLMProvider
 from .types import ModelRequest, ModelResponse, TokenUsage
+from ..utils.path_safety import validate_media_path
 
 logger = structlog.get_logger()
 
@@ -160,11 +161,16 @@ class OpenAICompatibleProvider(LLMProvider):
         File I/O and HTTP are both blocking here, which is correct inside a thread.
         """
         import mimetypes
-        mime, _ = mimetypes.guess_type(audio_path)
+        try:
+            safe_audio_path = validate_media_path(audio_path)
+        except ValueError as ve:
+            logger.warning("openai.whisper_path_rejected", error=str(ve))
+            raise
+        mime, _ = mimetypes.guess_type(safe_audio_path)
         if not mime:
             mime = "audio/ogg"
         try:
-            with open(audio_path, "rb") as f:
+            with open(safe_audio_path, "rb") as f:
                 audio_bytes = f.read()
             if not audio_bytes:
                 raise ValueError("audio file is empty")
@@ -172,7 +178,7 @@ class OpenAICompatibleProvider(LLMProvider):
                 resp = client.post(
                     "https://api.openai.com/v1/audio/transcriptions",
                     headers={"Authorization": f"Bearer {self._api_key}"},
-                    files={"file": (audio_path.split("/")[-1], audio_bytes, mime)},
+                    files={"file": (safe_audio_path.split("/")[-1], audio_bytes, mime)},
                     data={"model": "whisper-1"},
                 )
                 resp.raise_for_status()
@@ -199,10 +205,11 @@ class OpenAICompatibleProvider(LLMProvider):
                 and self.supports_vision(model)
             ):
                 try:
-                    with open(request.image_path, "rb") as f:
+                    safe_path = validate_media_path(request.image_path)
+                    with open(safe_path, "rb") as f:
                         img_b64 = base64.b64encode(f.read()).decode()
                     import mimetypes
-                    mime, _ = mimetypes.guess_type(request.image_path)
+                    mime, _ = mimetypes.guess_type(safe_path)
                     mime = mime or "image/jpeg"
                     messages.append({
                         "role": "user",

@@ -6,6 +6,7 @@ import structlog
 
 from .base import LLMProvider
 from .types import ModelRequest, ModelResponse, TokenUsage
+from ..utils.path_safety import validate_media_path
 
 logger = structlog.get_logger()
 
@@ -78,10 +79,11 @@ class GoogleProvider(LLMProvider):
                 ):
                     parts = [{"text": m.content}]
                     try:
-                        with open(request.image_path, "rb") as f:
+                        safe_path = validate_media_path(request.image_path)
+                        with open(safe_path, "rb") as f:
                             img_b64 = base64.b64encode(f.read()).decode()
                         import mimetypes
-                        mime, _ = mimetypes.guess_type(request.image_path)
+                        mime, _ = mimetypes.guess_type(safe_path)
                         mime = mime or "image/jpeg"
                         parts.append({"inlineData": {"mimeType": mime, "data": img_b64}})
                     except Exception as e:

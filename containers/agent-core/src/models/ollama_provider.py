@@ -6,6 +6,7 @@ import structlog
 
 from .base import LLMProvider
 from .types import Message, ModelRequest, ModelResponse, TokenUsage
+from ..utils.path_safety import validate_media_path
 
 logger = structlog.get_logger()
 
@@ -254,7 +255,8 @@ class OllamaProvider(LLMProvider):
                 and self.supports_vision(model)
             ):
                 try:
-                    with open(request.image_path, "rb") as f:
+                    safe_path = validate_media_path(request.image_path)
+                    with open(safe_path, "rb") as f:
                         img_b64 = base64.b64encode(f.read()).decode()
                     msg["images"] = [img_b64]
                 except Exception as e:
