@@ -17,6 +17,7 @@ const sidebars = {
         'getting-started/docker-setup',
         'getting-started/environment-variables',
         'getting-started/first-launch',
+        'getting-started/dashboard-access',
       ],
     },
     {

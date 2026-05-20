@@ -36,7 +36,7 @@ That single line:
 5. Walks you through onboarding (Telegram, provider keys, dashboard credentials)
 6. Builds the containers and starts the stack
 
-Default install path: `/opt/wasp`. Default dashboard: `http://<your-host>:8080`.
+Default install path: `/opt/wasp`. The dashboard binds to `127.0.0.1:8080` (loopback only) for safety — to reach it from another machine, use an SSH tunnel or put a TLS reverse proxy in front. See [Dashboard Access](https://docs.agentwasp.com/getting-started/dashboard-access) for the three supported options.
 
 ### Verify the installer (optional, recommended)
 

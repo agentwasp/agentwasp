@@ -13,10 +13,19 @@ Single-bug hotfix on top of v2.7.1. The v2.7.1 installer aborted at step 9/10 on
 
 - **Fresh install fails at step 9/10** (#11, PR #12). `install.sh` lines 559 and 621 now wrap the `grep` in `{ grep ... || true; }` so a missing key falls back to the default `127.0.0.1` instead of triggering pipefail. `.env.example` now ships with `DASHBOARD_BIND=127.0.0.1` plus a comment documenting the SSH tunnel and the `0.0.0.0` opt-in path.
 
+### Docs
+
+- **Dashboard access not documented after the v2.7.1 binding change.** The v2.7.1 release moved the dashboard to `127.0.0.1:8080` by default, but the README still claimed `Default dashboard: http://<your-host>:8080` and the docs-site had only a single passing reference. A new operator following the README would conclude the dashboard was broken. Fixed:
+  - `README.md` line 39 corrected to point at the new Dashboard Access page.
+  - New page `docs/getting-started/dashboard-access.md` covering the three supported patterns: SSH tunnel, TLS reverse proxy (Caddy + nginx examples), and the `DASHBOARD_BIND=0.0.0.0` opt-in for short-lived LAN testing.
+  - `environment-variables.md` now lists `DASHBOARD_BIND` (was missing despite shipping in `.env.example`).
+  - `first-launch.md` and `installation.md` link to the new page.
+
 ### Notes
 
 - This is a maintainer-self-reported regression. The bug ships in the v2.7.1 tarball but is not exploitable; it just blocks the installer. The fix is mechanical and changes no runtime behavior.
 - v2.7.1 users who already have a working install do not need to update — nothing changes for them. v2.7.2 is only relevant for anyone running `install.sh` from scratch.
+- The docs additions above ship in the v2.7.2 docs build on `docs.agentwasp.com`. No new version tag is cut for docs-only follow-up.
 
 ## [2.7.1] — 2026-05-19 (security patch release)
 

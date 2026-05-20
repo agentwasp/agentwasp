@@ -65,6 +65,7 @@ Per-connector credentials (Slack, Discord, GitHub, Notion, Binance, Coinbase, et
 | `LOG_LEVEL` | `INFO` | structlog level — `DEBUG`, `INFO`, `WARNING`, `ERROR`. |
 | `SOVEREIGN_MODE` | `true` | Raises `MAX_SKILL_ROUNDS` to 12 and injects the operator prime block at the top of every system prompt. |
 | `DASHBOARD_PORT` | `8080` | Host-facing port for the dashboard. |
+| `DASHBOARD_BIND` | `127.0.0.1` | Host interface the dashboard listens on. Default `127.0.0.1` means loopback only — the dashboard is reachable from the host itself but **not** from the public internet. Set to `0.0.0.0` to expose publicly (only do this behind a TLS reverse proxy). See [Dashboard Access](/getting-started/dashboard-access) for the three supported access patterns. |
 
 ## Feature flags (Pydantic settings)
 

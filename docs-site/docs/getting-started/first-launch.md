@@ -44,7 +44,9 @@ curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMe" | jq
 
 ## Sign in to the dashboard
 
-Open `http://<host>:8080` (or your reverse-proxy HTTPS host) and sign in with `DASHBOARD_USER` / `DASHBOARD_PASSWORD`.
+The dashboard binds to `127.0.0.1:8080` by default (loopback only). From the host itself, open `http://localhost:8080`. From another machine, you have three options — SSH tunnel, TLS reverse proxy, or `DASHBOARD_BIND=0.0.0.0` for short-lived LAN testing. See [Dashboard Access](/getting-started/dashboard-access) for the full guide.
+
+Sign in with `DASHBOARD_USER` / `DASHBOARD_PASSWORD`.
 
 If you didn't set those in onboarding, a temporary password was printed to stderr on first boot. Tail the agent-core logs to find it:
 

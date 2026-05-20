@@ -18,6 +18,14 @@ All notable changes to WASP are documented here. Versions follow a semantic vers
 
 - **#11 / PR #12**: Fresh install aborts at step 9/10 with `Install failed at line 559`. The PR #9 UFW gating logic grepped for `DASHBOARD_BIND=` in `.env` without `|| true`; under `set -Eeuo pipefail` a missing match returned exit 1 and aborted the installer. The shipped `.env.example` did not include the key, so every new install hit the error. Fix wraps both grep call sites and adds `DASHBOARD_BIND=127.0.0.1` to `.env.example` with inline documentation.
 
+### Docs (follow-up — same v2.7.2 cycle, no new tag)
+
+- **Dashboard access not documented after the v2.7.1 binding change.** The v2.7.1 release moved the dashboard to `127.0.0.1:8080` by default, but the README still claimed `Default dashboard: http://<your-host>:8080` and the docs-site had only a single passing reference. A new operator following the README would conclude the dashboard was broken. Fixed:
+  - README updated to point at the new page.
+  - New page [Dashboard Access](/getting-started/dashboard-access) covering the three supported patterns: SSH tunnel, TLS reverse proxy (Caddy + nginx examples), and the `DASHBOARD_BIND=0.0.0.0` opt-in for short-lived LAN testing.
+  - [Environment Variables](/getting-started/environment-variables) now lists `DASHBOARD_BIND` (was missing despite shipping in `.env.example`).
+  - [First Launch](/getting-started/first-launch) and [Installation](/getting-started/installation) link to the new page.
+
 ### Notes
 
 - Maintainer-self-reported. Bug shipped in the v2.7.1 tarball but is not exploitable; it only blocks the installer.

@@ -113,7 +113,13 @@ wasp health    # runs the full health probe suite
 wasp logs      # tail agent-core logs
 ```
 
-Then open `http://<your-host>:8080` in your browser. Default credentials are the ones you just set.
+Then open the dashboard. It binds to `127.0.0.1:8080` by default, so from the VPS itself use `http://localhost:8080`. From another machine, the simplest option is an SSH tunnel:
+
+```bash
+ssh -L 8080:127.0.0.1:8080 user@your-vps
+```
+
+Then browse to `http://localhost:8080` on your local machine. See [Dashboard Access](/getting-started/dashboard-access) for reverse-proxy and other options. Default credentials are the ones you just set.
 
 ## Windows (via WSL2)
 
