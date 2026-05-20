@@ -556,7 +556,9 @@ else
     # The default bind is 127.0.0.1 (loopback only), in which case no
     # firewall rule is needed and opening 8080 would needlessly increase
     # the host's exposed-port surface.
-    DASHBOARD_BIND_VAL="$(grep -E '^DASHBOARD_BIND=' "${INSTALL_DIR}/.env" 2>/dev/null | cut -d= -f2)"
+    # `|| true` guards against pipefail when DASHBOARD_BIND is not in .env
+    # (grep exits 1 on no match, which would abort the installer under `set -e`).
+    DASHBOARD_BIND_VAL="$({ grep -E '^DASHBOARD_BIND=' "${INSTALL_DIR}/.env" 2>/dev/null || true; } | cut -d= -f2)"
     DASHBOARD_BIND_VAL="${DASHBOARD_BIND_VAL:-127.0.0.1}"
     if [[ "$DASHBOARD_BIND_VAL" == "0.0.0.0" ]] && \
        command -v ufw >/dev/null 2>&1 && \
@@ -618,7 +620,7 @@ ok "${C_BOLD}🚀  WASP is installed${C_RESET}"
 DASH_PORT=8080
 # Read the host bind from .env to decide which URL to show. The default
 # install binds the dashboard to 127.0.0.1 (loopback) for safety.
-DASH_BIND="$(grep -E '^DASHBOARD_BIND=' "${INSTALL_DIR}/.env" 2>/dev/null | cut -d= -f2)"
+DASH_BIND="$({ grep -E '^DASHBOARD_BIND=' "${INSTALL_DIR}/.env" 2>/dev/null || true; } | cut -d= -f2)"
 DASH_BIND="${DASH_BIND:-127.0.0.1}"
 
 if [[ "$DASH_BIND" == "0.0.0.0" ]]; then

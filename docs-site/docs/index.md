@@ -7,7 +7,7 @@ slug: /
 
 # WASP Documentation
 
-**Current version: v2.7.1** (security patch on top of v2.7, the first public OSS release) — see [Changelog](/changelog) for full history.
+**Current version: v2.7.2** (installer hotfix on top of v2.7.1) — see [Changelog](/changelog) for full history.
 
 WASP is a self-hosted, single-operator autonomous AI agent. It runs as a Docker Compose stack on a VPS or workstation, accepts natural-language instructions through Telegram or a web dashboard, and executes them using a built-in skill library, a goal/plan engine, and a long-lived memory system.
 

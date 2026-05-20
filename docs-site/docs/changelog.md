@@ -10,6 +10,21 @@ All notable changes to WASP are documented here. Versions follow a semantic vers
 
 ---
 
+## v2.7.2 — May 20, 2026
+
+**Focus: Installer hotfix on top of v2.7.1. One-line fix for a regression introduced by PR #9.**
+
+### Fixed
+
+- **#11 / PR #12**: Fresh install aborts at step 9/10 with `Install failed at line 559`. The PR #9 UFW gating logic grepped for `DASHBOARD_BIND=` in `.env` without `|| true`; under `set -Eeuo pipefail` a missing match returned exit 1 and aborted the installer. The shipped `.env.example` did not include the key, so every new install hit the error. Fix wraps both grep call sites and adds `DASHBOARD_BIND=127.0.0.1` to `.env.example` with inline documentation.
+
+### Notes
+
+- Maintainer-self-reported. Bug shipped in the v2.7.1 tarball but is not exploitable; it only blocks the installer.
+- Existing v2.7 to v2.7.1 upgrades via `wasp update` were not affected — only fresh installs.
+
+---
+
 ## v2.7.1 — May 19, 2026
 
 **Focus: Security patch release. Four issues from an external 9-engine security audit ([@Lucky3mc](https://github.com/Lucky3mc) via Debuggix), plus the post-launch hardening commits that landed between the v2.7 tag and this release.**

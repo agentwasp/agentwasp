@@ -5,6 +5,19 @@ All notable changes to WASP are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions: [SemVer](https://semver.org/). Full pre-OSS history (v2.3 → v2.6) lives at https://docs.agentwasp.com/changelog — the entries below cover the public-release work on top of that baseline.
 
+## [2.7.2] — 2026-05-20 (installer hotfix)
+
+Single-bug hotfix on top of v2.7.1. The v2.7.1 installer aborted at step 9/10 on fresh installs because the new UFW gating logic introduced in PR #9 grepped for `DASHBOARD_BIND=` in `.env` without tolerating a missing match under `set -Eeuo pipefail`. The shipped `.env.example` did not include the key, so every new install hit the error. Existing v2.7 to v2.7.1 upgrades via `wasp update` were not affected (the installer is only used for fresh installs).
+
+### Fixed
+
+- **Fresh install fails at step 9/10** (#11, PR #12). `install.sh` lines 559 and 621 now wrap the `grep` in `{ grep ... || true; }` so a missing key falls back to the default `127.0.0.1` instead of triggering pipefail. `.env.example` now ships with `DASHBOARD_BIND=127.0.0.1` plus a comment documenting the SSH tunnel and the `0.0.0.0` opt-in path.
+
+### Notes
+
+- This is a maintainer-self-reported regression. The bug ships in the v2.7.1 tarball but is not exploitable; it just blocks the installer. The fix is mechanical and changes no runtime behavior.
+- v2.7.1 users who already have a working install do not need to update — nothing changes for them. v2.7.2 is only relevant for anyone running `install.sh` from scratch.
+
 ## [2.7.1] — 2026-05-19 (security patch release)
 
 Security-focused patch release. Closes a security audit reported by [@Lucky3mc](https://github.com/Lucky3mc) using the 9-engine Debuggix scan, plus the post-launch hardening commits that landed between the v2.7 tag and this release.
