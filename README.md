@@ -21,6 +21,14 @@ Self-hosted autonomous AI agent. Plans, executes, and improves itself running on
 
 WASP is not a chat-UI wrapper. There is real architecture underneath: an event bus, a goal orchestrator, a 41-job scheduler, layered memory, a truth/policy layer that grounds responses against actual actions, and a self-repair loop that can rewrite its own code.
 
+<div align="center">
+
+<video src="https://agentwasp.com/wasp-brain.mp4" controls muted playsinline width="800"></video>
+
+<sub><em>Inside the WASP brain — memory, knowledge graph, world model, and the goal engine running together.</em></sub>
+
+</div>
+
 ## Install
 
 ```bash
