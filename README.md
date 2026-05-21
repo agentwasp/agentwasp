@@ -23,9 +23,9 @@ WASP is not a chat-UI wrapper. There is real architecture underneath: an event b
 
 <div align="center">
 
-<video src="https://agentwasp.com/wasp-brain.mp4" controls muted playsinline width="800"></video>
+[![Inside the WASP brain](https://agentwasp.com/wasp-brain-poster.jpg)](https://agentwasp.com/wasp-brain.mp4)
 
-<sub><em>Inside the WASP brain — memory, knowledge graph, world model, and the goal engine running together.</em></sub>
+<sub><em>Inside the WASP brain — all running together.</em></sub>
 
 </div>
 
