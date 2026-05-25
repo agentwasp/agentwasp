@@ -10,7 +10,7 @@ description: Source tree, key modules, and where to find things.
 $WASP_INSTALL_DIR/                            -- default: /opt/wasp
 ├── README.md                                 -- repo-level intro
 ├── CHANGELOG.md                              -- public version history (v2.7 baseline)
-├── LICENSE.md                                -- BSL 1.1 → Apache 2.0 (2029-05-13)
+├── LICENSE.md                                -- Apache License 2.0
 ├── VERSION                                   -- semantic version (current: 2.7)
 ├── docs/                                     -- canonical operator docs (Markdown)
 ├── bin/wasp                                  -- CLI symlinked to /usr/local/bin/wasp

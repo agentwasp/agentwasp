@@ -6,7 +6,7 @@
 
 Self-hosted autonomous AI agent. Plans, executes, and improves itself running on infrastructure you own.
 
-[![License: BSL 1.1](https://img.shields.io/badge/License-BSL%201.1-F5C542?style=flat-square)](LICENSE.md)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-F5C542?style=flat-square)](LICENSE.md)
 [![Version](https://img.shields.io/badge/version-2.7.2-F5C542?style=flat-square)](CHANGELOG.md)
 [![Docs](https://img.shields.io/badge/docs-agentwasp.com-F5C542?style=flat-square)](https://docs.agentwasp.com)
 [![Install](https://img.shields.io/badge/install-1%20line-F5C542?style=flat-square)](#install)
@@ -25,7 +25,7 @@ WASP is not a chat-UI wrapper. There is real architecture underneath: an event b
 
 https://github.com/user-attachments/assets/0a14bd31-871a-4747-a48e-5d35ed6f8619
 
-<sub><em>Inside the WASP brain. All running together.</em></sub>
+<sub><em>Inside the WASP brain — all running together.</em></sub>
 
 </div>
 
@@ -159,7 +159,7 @@ See [docs.agentwasp.com](https://docs.agentwasp.com) for the full architecture r
 - [docs/SECURITY.md](docs/SECURITY.md) — threat model, fail-closed defaults, secret handling
 - [docs/STATUS_AND_LIMITS.md](docs/STATUS_AND_LIMITS.md) — **honest** map of what works and what's experimental
 - [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — common errors with fixes
-- [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) — dev setup, release process, BSL implications
+- [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) — dev setup, release process, license terms for contributions
 - [CHANGELOG.md](CHANGELOG.md) — version history (v2.7 is the first public release; pre-OSS history at [docs.agentwasp.com/changelog](https://docs.agentwasp.com/changelog))
 
 ## Status
@@ -168,9 +168,9 @@ WASP v2.7 is the first public OSS release. The core systems (event bus, goal orc
 
 ## License
 
-WASP is released under the [Business Source License 1.1](LICENSE.md). Plain English: you can self-host, evaluate, modify, and use it freely — including in production and even offering services to third parties — **as long as your aggregate annual revenue from products incorporating WASP stays below USD $1,000,000**. Above that threshold, a commercial license is required. The license auto-converts to Apache 2.0 on **2029-05-13** (3 years from launch).
+WASP is released under the [Apache License 2.0](LICENSE.md). You may use, modify, and distribute it freely, including for commercial and production deployments, subject to the standard Apache 2.0 terms (preserve the license notice, mark modified files, and include a copy of the license with redistributions). Apache 2.0 also grants an explicit patent license from each contributor and includes a patent retaliation clause.
 
-This is a one-paragraph summary, not legal advice — read the full license before using WASP commercially.
+The "WASP" name and logo are trademarks of the project and are not granted by this license.
 
 ## Support
 

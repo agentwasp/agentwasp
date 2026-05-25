@@ -10,6 +10,12 @@ All notable changes to WASP are documented here. Versions follow a semantic vers
 
 ---
 
+## Unreleased — License change
+
+**License changed from Business Source License 1.1 to Apache License 2.0.** WASP is now under standard permissive open-source terms. The previous BSL 1.1 + USD $1M annual revenue threshold + Change Date 2029-05-13 mechanism has been removed entirely. Apache 2.0 grants explicit patent rights from contributors, includes a patent retaliation clause, and reserves the "WASP" trademark to the project. Commercial use, redistribution, and modification are all permitted under standard Apache 2.0 terms. All prior contributions to WASP are relicensed under Apache 2.0; future contributions are accepted under the same terms.
+
+---
+
 ## v2.7.2 — May 20, 2026
 
 **Focus: Installer hotfix on top of v2.7.1. One-line fix for a regression introduced by PR #9.**

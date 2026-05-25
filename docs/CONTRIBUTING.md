@@ -4,7 +4,7 @@ WASP welcomes contributions. Please read before opening a PR.
 
 ## License implications
 
-WASP is licensed under [BSL 1.1](../LICENSE.md). By contributing, you agree that your contribution is licensed under the same BSL terms. After the Change Date in the license, your contribution becomes Apache 2.0 along with the rest of the work.
+WASP is licensed under [Apache 2.0](../LICENSE.md). By submitting a contribution, you agree that your contribution is licensed under the same Apache 2.0 terms, including the explicit patent grant in Section 3 of the license. There is no separate CLA — the inbound = outbound model applies.
 
 If you are not comfortable with this, please do not contribute code. Documentation and bug reports are always welcome regardless.
 

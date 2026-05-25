@@ -5,6 +5,12 @@ All notable changes to WASP are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions: [SemVer](https://semver.org/). Full pre-OSS history (v2.3 → v2.6) lives at https://docs.agentwasp.com/changelog — the entries below cover the public-release work on top of that baseline.
 
+## [Unreleased] — license change
+
+### Changed
+
+- **License changed from Business Source License 1.1 to Apache License 2.0.** WASP is now under standard permissive open-source terms. The previous BSL 1.1 + USD $1M annual revenue threshold + Change Date 2029-05-13 mechanism has been removed entirely. Apache 2.0 grants explicit patent rights from contributors, includes a patent retaliation clause, and reserves the "WASP" trademark to the project. Commercial use, redistribution, and modification are all permitted under standard Apache 2.0 terms. All prior contributions to WASP are relicensed under Apache 2.0; future contributions are accepted under the same terms.
+
 ## [2.7.2] — 2026-05-20 (installer hotfix)
 
 Single-bug hotfix on top of v2.7.1. The v2.7.1 installer aborted at step 9/10 on fresh installs because the new UFW gating logic introduced in PR #9 grepped for `DASHBOARD_BIND=` in `.env` without tolerating a missing match under `set -Eeuo pipefail`. The shipped `.env.example` did not include the key, so every new install hit the error. Existing v2.7 to v2.7.1 upgrades via `wasp update` were not affected (the installer is only used for fresh installs).
@@ -109,7 +115,7 @@ The work in this entry is what made v2.7 publishable as an OSS project on top of
 - Centralized SSRF guard (`utils/network_safety.py`) with DNS rebinding protection and manual redirect re-validation.
 - Volume-aware `wasp backup` / `wasp restore` covering Postgres + named Docker volumes (redis, ollama, memory, logs, screenshots, browser sessions, uploads).
 - Public docs: README, INSTALL, QUICKSTART, DEPLOYMENT, TROUBLESHOOTING, SECURITY, CONTRIBUTING.
-- BSL 1.1 license with Change Date 2029-05-13 → Apache 2.0. Production use permitted under USD $1M annual revenue threshold.
+- Initial public license: Business Source License 1.1 with Change Date 2029-05-13 → Apache 2.0 (subsequently changed to Apache 2.0 outright — see Unreleased entry above).
 
 ### Security
 - Fail-closed defaults: Telegram refuses startup if `TELEGRAM_ALLOWED_USERS` is empty. There is no public-bot mode and no escape hatch.
@@ -122,7 +128,7 @@ The work in this entry is what made v2.7 publishable as an OSS project on top of
 
 ### Known limits
 - Some cognitive systems (procedural memory, behavioral rules, learning examples, opportunities) require accumulated usage before they show data. See `docs/STATUS_AND_LIMITS.md`.
-- BSL 1.1 prohibits production use by entities with >USD $1M annual revenue from WASP-incorporating products until 2029-05-13.
+- (Superseded by the Unreleased license change above — WASP is now Apache 2.0 with no revenue threshold.)
 - Single-operator design: there is no built-in multi-tenancy. The dashboard supports multiple admin accounts but every operator shares the same memory, scheduler, and skill surface.
 
 ### Removed

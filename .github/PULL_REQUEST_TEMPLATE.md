@@ -13,7 +13,7 @@ The motivation — issue number, bug report, or use case.
 - [ ] manually verified the change end-to-end
 - [ ] no secrets, tokens, or personal data committed
 - [ ] dashboard/Telegram flows still work
-- [ ] read and accept [BSL 1.1 license terms](../LICENSE.md)
+- [ ] contribution licensed under [Apache 2.0](../LICENSE.md) (inbound = outbound)
 - [ ] followed [CONTRIBUTING.md](../docs/CONTRIBUTING.md)
 
 ## Screenshots / output (if UI or behavior change)
