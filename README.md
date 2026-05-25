@@ -21,7 +21,7 @@ Self-hosted autonomous agent runtime built around reliability. Truth-binding res
 
 WASP is an operational runtime built for operators who need an agent they can actually trust to run unattended. Three architectural commitments make it different from other self-hosted agent harnesses: a deterministic truth-binding response layer that grounds every output against actions actually taken, layered persistent memory across 10+ named tiers (including a knowledge graph and temporal world model), and capability tiers per skill with anticipatory simulation before privileged operations.
 
-For a row-by-row comparison against [Hermes Agent](https://github.com/NousResearch/hermes-agent) and [OpenClaw](https://github.com/openclaw/openclaw), see the [comparison table at agentwasp.com](https://agentwasp.com/#comparison).
+For a row-by-row comparison against **Hermes Agent** and **OpenClaw**, see the [comparison table at agentwasp.com](https://agentwasp.com/#comparison).
 
 <div align="center">
 
