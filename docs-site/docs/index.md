@@ -1,17 +1,19 @@
 ---
 id: index
-title: WASP — Autonomous AI Agent Platform
-description: WASP is a self-governing autonomous AI agent that plans, executes, and learns.
+title: WASP · Self-Hosted Autonomous Agent Runtime
+description: WASP is a self-hosted autonomous agent runtime built around reliability, persistent memory, and capability isolation.
 slug: /
 ---
 
 # WASP Documentation
 
-**Current version: v2.7.2** (installer hotfix on top of v2.7.1) — see [Changelog](/changelog) for full history.
+**Current version: v2.7.2** (installer hotfix on top of v2.7.1). See [Changelog](/changelog) for full history.
 
-WASP is a self-hosted, single-operator autonomous AI agent. It runs as a Docker Compose stack on a VPS or workstation, accepts natural-language instructions through Telegram or a web dashboard, and executes them using a built-in skill library, a goal/plan engine, and a long-lived memory system.
+WASP is a self-hosted, single-operator autonomous agent runtime. It runs as a Docker Compose stack on a VPS or workstation, accepts natural-language instructions through Telegram or a web dashboard, and executes them using a built-in skill library, a goal orchestrator with plan critic, capability tiers per skill, and 10+ named persistent memory layers.
 
 It is designed for one operator. It is not a multi-tenant SaaS platform.
+
+For a comparison against [Hermes Agent](https://github.com/NousResearch/hermes-agent) and [OpenClaw](https://github.com/openclaw/openclaw), see the [comparison table at agentwasp.com](https://agentwasp.com/#comparison).
 
 ## What WASP is
 
@@ -24,10 +26,10 @@ It is designed for one operator. It is not a multi-tenant SaaS platform.
 
 ## What WASP is not
 
-- It is not a chatbot framework. It is an operator-controlled agent that performs side-effects when explicitly asked.
 - It is not a managed cloud service. You run it on your own VPS.
-- It is not multi-tenant out of the box.
-- It is not a guarantee of correctness. The policy layer reduces hallucinations and unsafe actions, but the underlying LLM is probabilistic. See [Known Limitations](/known-limitations).
+- It is not a coding agent like Claude Code or Cursor. It is a general-purpose runtime.
+- It is not multi-tenant out of the box. One operator per install.
+- It is not a guarantee of correctness. The truth layer and policy guards reduce hallucinations and unsafe actions, but the underlying LLM is probabilistic. See [Known Limitations](/known-limitations).
 
 ## Architecture summary
 

@@ -52,7 +52,7 @@ This document is the **honest** map of what works, what's experimental, and what
 | Temporal world model (`world_timeline`) | Beta | Crypto prices + user-state changes tracked. |
 | Self-model | Beta | Strengths, failures, preferences updated each message; file-backed at `/data/memory/self_model.json`. |
 | Epistemic state | Beta | Per-domain confidence (programming, legal, etc.). |
-| Dream cycle | Beta | Runs every hour when idle (>2h or 1-7am); consolidates memory + extracts KG. |
+| Background consolidation cycle | Beta | Runs every hour when idle (>2h or 1-7am); consolidates memory + extracts KG. |
 | Autonomous goal generator | Beta | Rate-limited (1/hr, 5/day); critical-threshold checks bypass LLM. |
 | CPI monitor (cognitive pressure index) | Stable | 5-min cadence; pauses heavy jobs when >80. |
 | Self-integrity monitor | Stable | 6h cadence; cross-checks self-model vs actual rates. |

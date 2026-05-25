@@ -1,10 +1,10 @@
 ---
 id: autonomous-goals
-title: Autonomous Goals and Dream Mode
-description: Autonomous Goal Generator, Dream Mode, perception, and CPI gating.
+title: Autonomous Goals and Background Consolidation
+description: Autonomous Goal Generator, Background Consolidation cycle, perception, and CPI gating.
 ---
 
-# Autonomous Goals and Dream Mode
+# Autonomous Goals and Background Consolidation
 
 Two background systems can generate Goals without operator input: the **Autonomous Goal Generator** (reactive, threshold-driven) and the **Dream Cycle** (idle-time consolidation).
 
@@ -55,9 +55,9 @@ When the generator creates a goal, the operator receives a Telegram notification
 Reason: Disk at 88% — clearing space to maintain optimal performance
 ```
 
-## Dream Cycle
+## Background Consolidation Cycle
 
-`scheduler/dream.py`. Feature-flagged via `dream_enabled` (default `true`).
+`scheduler/dream.py`. Feature-flagged via `dream_enabled` (default `true`). Internally the implementation module retains the legacy `dream` name; the runtime concept and operator-facing label are "background consolidation".
 
 ### Activation conditions
 
@@ -65,7 +65,7 @@ ALL must hold:
 
 - Operator inactive > 2 h
 - (Night 1–7 am local time) OR (operator inactive > 4 h)
-- Last dream > 6 h ago
+- Last consolidation > 6 h ago
 - `agent:cpi_high` flag NOT set
 
 ### Activities
@@ -74,7 +74,7 @@ When activated, the cycle:
 
 1. **Memory consolidation** via `PromotionEngine` — promotes recurring/important episodic entries to semantic memory.
 2. **Knowledge graph extraction** for any unprocessed conversations.
-3. **LLM reflection** — short narrative on the day's activity, written to `dream_log`.
+3. **LLM reflection** — short narrative on the day's activity, written to `consolidation_log` (table name in DB: `dream_log`).
 4. **Crypto prefetch** — for assets in the KG, fetch latest prices into the temporal world model so the next morning's first message has fresh data.
 5. **Failure pattern analysis** — query `audit_log` for errors in the past 7 days; classify into `FailurePattern(tool, error_type, frequency, first_seen, last_seen)`; upsert into `self_model["known_failures"]`.
 

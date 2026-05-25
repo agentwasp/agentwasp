@@ -21,12 +21,12 @@ WASP is in active production deployment and now publishable as a self-hostable O
 - [x] Custom Python skill creation and management via `skill_manager`
 - [x] Skill Evolution (automatic synthesis from recurring patterns, AST validation)
 - [x] 41 scheduler background jobs (health, learning, perception, pruning, weekly DB maintenance)
-- [x] 18 memory systems (episodic, semantic, procedural, visual, vector, KG, self-model, temporal, goal-scoped, ranked retrieval, reflection, behavioral rules, learning examples, dream log, recovery memory, skill patterns, entity states, state predictions)
+- [x] 18 memory systems (episodic, semantic, procedural, visual, vector, KG, self-model, temporal, goal-scoped, ranked retrieval, reflection, behavioral rules, learning examples, consolidation log, recovery memory, skill patterns, entity states, state predictions)
 - [x] Memory ranking (composite score: 0.5×similarity + 0.3×recency + 0.2×importance)
 - [x] Knowledge Graph with Redis cache (rule-based NLP extraction)
 - [x] Temporal World Model (`world_timeline` table, price/state extraction, trend detection)
 - [x] Multi-agent orchestration (AgentOrchestrator, AgentRuntime, CapabilitySandbox, inter-agent bus)
-- [x] Dream Mode (memory consolidation, KG enrichment, LLM reflection, failure pattern analysis)
+- [x] Background Consolidation (memory consolidation, KG enrichment, LLM reflection, failure pattern analysis)
 - [x] Autonomous Goal Generator (proactive LLM-evaluated goal creation, rate limited)
 - [x] Background Perception (crypto price monitoring, KG-sourced assets)
 - [x] Behavioral Learning Loop (correction detection, LLM rule synthesis, dedup + conflict detection)
@@ -54,7 +54,7 @@ WASP is in active production deployment and now publishable as a self-hostable O
 - [x] Domain Drift Protection (browser→crypto/email substitution detection, should_retry=False on confirmed substitution)
 - [x] HealthState Adaptive Execution (CPU/RAM/latency-based light mode hint injection)
 - [x] SaccadicVision Change Detection Daemon (2s SHA-1 polling, browser content change events)
-- [x] Dream Failure Pattern Analysis (7-day audit error classification into FailurePattern records)
+- [x] Consolidation Failure Pattern Analysis (7-day audit error classification into FailurePattern records)
 - [x] Self-Improve Soft Safety Gate (deterministic pattern gate, BLOCK/WARN/ALLOW, 13 safety-weakening patterns)
 - [x] Self-Improve SHA-256 sidecar integrity (tamper detection for persisted patches)
 - [x] 40+ integration connectors (Slack, Discord, GitHub, Telegram, Notion, Gmail, smart home, etc.)
@@ -92,7 +92,7 @@ WASP is in active production deployment and now publishable as a self-hostable O
 - [x] **Centralized SSRF guard** (`utils/network_safety.py` with DNS-rebinding protection + manual redirect re-validation; applied to `http_request`, `fetch_url`, `scrape`, `monitors`, `subscriptions`)
 - [x] **Dashboard SPA navigation fixes** (path+query URL compare for tabs/filters/pagination; IIFE wrap of re-injected scripts to survive same-page const re-declarations)
 - [x] **CheckIn fresh-install guard** (proactive `¿Necesitas ayuda?` no longer fires on installs with zero episodic memory)
-- [x] **Public test coverage of Experimental subsystems** (38 new tests for learning / procedural / behavioral / dream)
+- [x] **Public test coverage of Experimental subsystems** (38 new tests for learning / procedural / behavioral / consolidation)
 
 ## Planned Features
 
@@ -155,7 +155,7 @@ WASP is in active production deployment and now publishable as a self-hostable O
 | Phase 7 | Health monitor, self-repair, introspector |
 | Phase 8 | Security hardening, dashboard, CSRF |
 | Phase 9 | Agent freedom: shell, python, browser skills |
-| Phase 10–16 | Cognitive systems: KG, temporal, epistemic, dream |
+| Phase 10–16 | Cognitive systems: KG, temporal, epistemic, consolidation |
 | Phase 17 | Multi-agent orchestration v1 |
 | Phase 18 | QA/SRE audit, 208 tests |
 | v1.5 | Skill evolution, world model, behavioral learning, CPI, integrity monitor |
@@ -168,7 +168,7 @@ WASP is in active production deployment and now publishable as a self-hostable O
 | v2.2 | deep_scraper built-in, dashboard streaming, 37 skills, 21-bug audit |
 | v2.3 | Universal Interaction Validation, div-button SPA, enforcement loop fix |
 | v2.4 | Response Grounding Engine (9 checks), DomainLock hardening |
-| v2.5 | Dashboard restructuring, 5 new pages, Config Center, HealthState, SaccadicVision, Dream failure analysis, 11-fix audit |
+| v2.5 | Dashboard restructuring, 5 new pages, Config Center, HealthState, SaccadicVision, consolidation failure analysis, 11-fix audit |
 | v2.6 | Panic Reset, SSRF on fetch_url, shell audit logging, behavioral conflict detection, weekly VACUUM ANALYZE, boot liveness ping, 10-fix hardening pass + Edge Fix Pass (low-intent guard, multi-URL aggregator, agent name preservation, schedule honesty bidirectional, markdown link sanitizer, entity-proximity verdict) |
 | **v2.7** | **First public OSS release. One-line cross-distro installer (8 Linux flavors + macOS + WSL2). Allowlist tarball build with forbidden-pattern scan. Fail-closed Telegram bridge (no public-bot mode). Gmail recipient allowlist. Self-improve `dry_run`. Centralized SSRF guard. Dashboard SPA navigation fixes (tab bars + filter pills + pagination across all list pages). CheckIn fresh-install guard. 622 tests passing. Docker socket removed from `agent-core` public default.** |
 

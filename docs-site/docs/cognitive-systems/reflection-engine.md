@@ -1,7 +1,7 @@
 ---
 id: reflection-engine
 title: Reflection Engine
-description: Per-goal post-mortem insights and dream-cycle reflection.
+description: Per-goal post-mortem insights and background consolidation reflection.
 ---
 
 # Reflection Engine
@@ -9,7 +9,7 @@ description: Per-goal post-mortem insights and dream-cycle reflection.
 WASP has two reflection layers:
 
 1. **Goal Meta-Reflection** — post-mortem after every goal completion or failure.
-2. **Dream-cycle reflection** — narrative reflection during the dream cycle.
+2. **Consolidation reflection** — narrative reflection during the background consolidation cycle.
 
 ## Goal Meta-Reflection
 
@@ -44,9 +44,9 @@ Stored in Redis with TTL 7 days; injected into context for similar future goals.
 
 Maximum 3 reflections per goal.
 
-## Dream-cycle reflection
+## Consolidation reflection
 
-`scheduler/dream.py` (gated). When the dream cycle activates, it runs an LLM reflection over the day's activity and writes:
+`scheduler/dream.py` (gated). When the background consolidation cycle activates, it runs an LLM reflection over the day's activity and writes:
 
 ```
 DreamLog(
@@ -63,7 +63,7 @@ The reflection is informal: a paragraph of "what went well today, what could be 
 
 ## Dashboard
 
-`/cognitive` shows recent reflections (Goal Meta and Dream).
+`/cognitive` shows recent reflections (Goal Meta and Consolidation).
 
 ## CPI gating
 
@@ -72,6 +72,6 @@ Both reflection layers skip when `agent:cpi_high` is set.
 ## See also
 
 - [Goal Engine](/core-concepts/goal-engine)
-- [Dream Mode](/advanced/autonomous-goals#dream-cycle)
+- [Background Consolidation](/advanced/autonomous-goals#background-consolidation-cycle)
 - [Self-Improve](/integrations/dashboard) — proposal review
 - [Behavioral Learning](/cognitive-systems/behavioral-learning) — separate but complementary: rules from corrections

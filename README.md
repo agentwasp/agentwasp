@@ -2,9 +2,9 @@
 
 <img src=".github/assets/logo.png" alt="WASP" width="420" />
 
-**A serious agent. Built to evolve.**
+**A serious runtime. Built to operate.**
 
-Self-hosted autonomous AI agent. Plans, executes, and improves itself running on infrastructure you own.
+Self-hosted autonomous agent runtime built around reliability. Truth-binding response layer, plan critic, capability tiers, knowledge graph and temporal world model, 10+ persistent memory tiers, 41 background jobs. Apache 2.0. Docker.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-F5C542?style=flat-square)](LICENSE.md)
 [![Version](https://img.shields.io/badge/version-2.7.2-F5C542?style=flat-square)](CHANGELOG.md)
@@ -19,13 +19,15 @@ Self-hosted autonomous AI agent. Plans, executes, and improves itself running on
 
 ---
 
-WASP is not a chat-UI wrapper. There is real architecture underneath: an event bus, a goal orchestrator, a 41-job scheduler, layered memory, a truth/policy layer that grounds responses against actual actions, and a self-repair loop that can rewrite its own code.
+WASP is an operational runtime built for operators who need an agent they can actually trust to run unattended. Three architectural commitments make it different from other self-hosted agent harnesses: a deterministic truth-binding response layer that grounds every output against actions actually taken, layered persistent memory across 10+ named tiers (including a knowledge graph and temporal world model), and capability tiers per skill with anticipatory simulation before privileged operations.
+
+For a row-by-row comparison against [Hermes Agent](https://github.com/NousResearch/hermes-agent) and [OpenClaw](https://github.com/openclaw/openclaw), see the [comparison table at agentwasp.com](https://agentwasp.com/#comparison).
 
 <div align="center">
 
 https://github.com/user-attachments/assets/0a14bd31-871a-4747-a48e-5d35ed6f8619
 
-<sub><em>Inside the WASP brain — all running together.</em></sub>
+<sub><em>The runtime, all subsystems operating together.</em></sub>
 
 </div>
 
@@ -69,20 +71,22 @@ wasp health      # run health probes
 
 ## What WASP does
 
-- **Conversational agent** with memory that persists across sessions: episodic, semantic, working, procedural, behavioral rules, knowledge graph, temporal world model.
+- **Layered persistent memory** across 28 PostgreSQL tables and Redis: episodic, semantic, working, procedural, behavioral rules, knowledge graph, temporal world model, vector embeddings, goal-scoped, self-model, per-domain epistemic confidence. Persists across sessions, reboots, and model switches.
 - **37 built-in skills**: web search, browser automation (nodriver + Selenium), email (Gmail with allowlist), scraping, scheduling, file ops, Python execution (sandboxed), reminders, RSS subscriptions, monitoring, self-improvement, and more.
-- **Goal orchestrator**: long-running plans broken into TaskGraph steps, retried on failure, replanned when blocked, validated by a Plan Critic before execution.
-- **Dashboard**: browser UI with 151 endpoints — chat, traces, tasks, scheduler, memory, knowledge graph, world model, agents, integrations, audit log, self-improve.
-- **Telegram bridge**: optional — natural language to your agent from your phone. Multi-language welcome (EN/ES/PT/FR).
-- **Self-improvement loop**: corrections you write become persistent behavioral rules. Recurring action patterns get abstracted into reusable procedures. The agent can read, patch, and rebuild its own source.
-- **Truth layer**: response binding, URL substitution guard, scheduler honesty, capability-claim verification, prompt-leak redaction — designed to make the agent's text match the actions it actually took.
+- **Goal orchestrator** with **Plan Critic**: long-running plans broken into TaskGraph steps, validated by an LLM critic before execution, retried on failure, replanned when blocked.
+- **Capability tiers per skill** (4 explicit levels: PUBLIC / CONTROLLED / RESTRICTED / PRIVILEGED) with **anticipatory simulation** that previews consequences before privileged operations.
+- **Truth-binding response layer**: 5 named deterministic guards (URL substitution, action announcer, response grounder, schedule honesty, prompt-leak redaction). No LLM in the policy path.
+- **Behavioral learning loop**: user corrections become persistent rules via LLM extraction, injected into every future prompt automatically.
+- **Controlled self-improvement**: agent reads, patches, and rebuilds its own source code. AST + sandbox validation. Patches persisted across container rebuilds.
+- **Dashboard**: 151 HTTP endpoints across chat, traces, scheduler, memory, knowledge graph, world model, agents, integrations, audit log, self-improve.
+- **41 background jobs**: memory consolidation, perception, autonomous goals, self-integrity monitor, CPI monitor, behavioral learner. Running 24/7 with persistent state and catch-up on restart.
 
 ## What WASP is not
 
 - Not a hosted SaaS. You run it yourself on a server or workstation.
-- Not a coding agent like Claude Code or Cursor — it is a general-purpose agent.
+- Not a coding agent like Claude Code or Cursor — it is a general-purpose runtime.
 - Not multi-tenant. One operator per install.
-- Not magic. The underlying LLM is probabilistic; the policy and truth layers reduce — but don't eliminate — hallucinations.
+- Not magic. The underlying LLM is probabilistic; the truth layer and policy guards reduce, but don't eliminate, hallucinations.
 
 ## Requirements
 
@@ -186,6 +190,6 @@ WASP is a young public project (v2.7 is the first release outside the original o
 
 <br/>
 
-**[agentwasp.com](https://agentwasp.com)** · Built to evolve.
+**[agentwasp.com](https://agentwasp.com)** · Built to operate.
 
 </div>
