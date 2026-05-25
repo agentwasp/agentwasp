@@ -6,7 +6,7 @@ description: Autonomous Goal Generator, Background Consolidation cycle, percepti
 
 # Autonomous Goals and Background Consolidation
 
-Two background systems can generate Goals without operator input: the **Autonomous Goal Generator** (reactive, threshold-driven) and the **Dream Cycle** (idle-time consolidation).
+Two background systems can generate Goals without operator input: the **Autonomous Goal Generator** (reactive, threshold-driven) and the **Background Consolidation Cycle** (idle-time consolidation).
 
 ## Autonomous Goal Generator
 

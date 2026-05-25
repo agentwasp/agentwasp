@@ -5,11 +5,18 @@ All notable changes to WASP are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions: [SemVer](https://semver.org/). Full pre-OSS history (v2.3 → v2.6) lives at https://docs.agentwasp.com/changelog — the entries below cover the public-release work on top of that baseline.
 
-## [Unreleased] — license change
+## [Unreleased]
 
 ### Changed
 
-- **License changed from Business Source License 1.1 to Apache License 2.0.** WASP is now under standard permissive open-source terms. The previous BSL 1.1 + USD $1M annual revenue threshold + Change Date 2029-05-13 mechanism has been removed entirely. Apache 2.0 grants explicit patent rights from contributors, includes a patent retaliation clause, and reserves the "WASP" trademark to the project. Commercial use, redistribution, and modification are all permitted under standard Apache 2.0 terms. All prior contributions to WASP are relicensed under Apache 2.0; future contributions are accepted under the same terms.
+- **License: Business Source License 1.1 → Apache License 2.0.** WASP is now under standard permissive open-source terms. The previous BSL 1.1 + USD $1M annual revenue threshold + Change Date 2029-05-13 mechanism has been removed entirely. Apache 2.0 grants explicit patent rights from contributors, includes a patent retaliation clause, and reserves the "WASP" trademark to the project. Commercial use, redistribution, and modification are all permitted under standard Apache 2.0 terms. All prior contributions are relicensed under Apache 2.0; future contributions are accepted under the same terms.
+- **Operator-facing rename: Dream Mode → Background Consolidation.** Applied across README, docs-site, and dashboard labels. Internal scheduler module (`scheduler/dream.py`) and DB table (`dream_log`) are unchanged; the cycle behavior is identical (memory consolidation, KG enrichment, LLM reflection, failure pattern analysis, crypto prefetch every hour when idle >2h or 1–7 am).
+- **README and docs-site index rewritten** with explicit naming of architectural commitments: truth-binding response layer, plan critic, capability tiers per skill with anticipatory simulation, knowledge graph + temporal world model, 10+ persistent memory tiers. Dropped the "not a chatbot framework" framing (wrong opponent for the self-hosted-harness audience). Docs-site index title is now "Self-Hosted Autonomous Agent Runtime". Added link to the row-by-row comparison vs Hermes Agent and OpenClaw at agentwasp.com.
+- **GitHub repo metadata**: repo description rewritten to match the reliability-runtime framing (was "...rather than a simple chatbot"). GitHub Discussions enabled for community Q&A.
+
+### Notes
+
+No runtime behavior changes. License (Apache 2.0) and docs/metadata only.
 
 ## [2.7.2] — 2026-05-20 (installer hotfix)
 
