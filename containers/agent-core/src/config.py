@@ -128,6 +128,27 @@ class Settings(BaseSettings):
     # "hash"   deterministic fallback, always available, non-semantic
     embedding_provider: str = "ollama"
 
+    # Memory backend strategy:
+    # - internal: AgentWasp filesystem/Postgres/Redis memory only
+    # - supermemory: Supermemory-only conversational memory/context path
+    # - tandem: bounded Supermemory profile/search plus existing internal memory
+    memory_backend: str = "supermemory"
+
+    # Supermemory backend — works with hosted API or local self-hosted server.
+    # Keep rerank/rewrite disabled by default to protect chat latency and token cost.
+    supermemory_api_key: str = ""
+    supermemory_base_url: str = "https://api.supermemory.ai"
+    supermemory_container_tag: str = "agentwasp"
+    supermemory_scope: str = "chat"  # chat | project | global
+    supermemory_timeout_seconds: float = 1.5
+    supermemory_context_budget_chars: int = 1800
+    supermemory_search_limit: int = 3
+    supermemory_search_threshold: float = 0.35
+    supermemory_rerank: bool = False
+    supermemory_rewrite_query: bool = False
+    supermemory_ingest_enabled: bool = True
+    supermemory_strict: bool = False
+
     # Memory Ranking System — composite relevance scoring before injection
     # score = 0.5 * similarity + 0.3 * recency + 0.2 * importance
     memory_ranking_enabled: bool = True

@@ -36,6 +36,34 @@ async def memory_list(
     per_page = 20
     offset = (page - 1) * per_page
 
+    if getattr(memory, "backend", "internal") == "supermemory":
+        empty_counts = {
+            "procedural": 0,
+            "behavioral": 0,
+            "dreams": 0,
+            "timeline": 0,
+            "kg_nodes": 0,
+            "kg_relations": 0,
+        }
+        return request.app.state.templates.TemplateResponse(request, "memory.html", {
+            "stats":         memory.get_stats(),
+            "memory_backend": "supermemory",
+            "supermemory_status": memory.supermemory_status() if hasattr(memory, "supermemory_status") else {},
+            "current_type":  type,
+            "search":        search,
+            "page":          page,
+            "per_page":      per_page,
+            "tab":           tab,
+            "layer_counts":  empty_counts,
+            "entries":       [],
+            "procedural":    [],
+            "timeline":      [],
+            "dreams":        [],
+            "kg_nodes":      [],
+            "kg_relations":  [],
+            "kg_node_names": {},
+        })
+
     # ── Counts (all from DB for coherence with search results) ────────────
     layer_counts = {}
     stats: dict = {}
@@ -134,8 +162,13 @@ async def memory_list(
             kg_node_names = {n.id: n.name for n in kg_nodes}
             kg_node_names.update({row.id: row.name for row in extra_nodes})
 
+    if getattr(memory, "backend", "internal") == "supermemory":
+        stats = memory.get_stats()
+
     return request.app.state.templates.TemplateResponse(request, "memory.html", {
         "stats":         stats,
+        "memory_backend": getattr(memory, "backend", "internal"),
+        "supermemory_status": memory.supermemory_status() if hasattr(memory, "supermemory_status") else {},
         "current_type":  type,
         "search":        search,
         "page":          page,

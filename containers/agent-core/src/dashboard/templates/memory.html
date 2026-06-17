@@ -120,6 +120,36 @@
     <div class="text-xs text-primary/80 border border-primary/20 rounded-lg px-3 py-1.5 bg-primary/5 font-mono" id="mem-clock"></div>
 </div>
 
+{% if supermemory_status %}
+<div class="card bg-base-100 shadow-sm wasp-accent mb-4" style="border-left-color:#10B98155">
+  <div class="card-body py-3 px-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+      <div>
+        <div class="text-sm font-semibold flex items-center gap-2">
+          <span>🧠 Supermemory</span>
+          <span class="badge badge-sm {% if supermemory_status.configured %}badge-success{% else %}badge-warning{% endif %}">{{ memory_backend }}</span>
+        </div>
+        <p class="text-xs text-base-content/45 mt-0.5">
+          {% if memory_backend == "tandem" %}
+          Tandem mode: Supermemory profile/search is capped before local Agent Wasp memory layers to control token and latency overhead.
+          {% elif memory_backend == "supermemory" %}
+          Supermemory-only mode: conversational recall uses Supermemory; legacy local memory tabs are read-only compatibility surfaces.
+          {% else %}
+          Internal memory mode: Supermemory is disabled.
+          {% endif %}
+        </p>
+      </div>
+      <div class="text-xs font-mono text-base-content/35 flex flex-wrap gap-x-4 gap-y-1">
+        <span>configured={{ supermemory_status.configured }}</span>
+        <span>scope={{ supermemory_status.scope }}</span>
+        <span>budget={{ supermemory_status.context_budget_chars }} chars</span>
+        <span>timeout={{ supermemory_status.timeout_seconds }}s</span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
 <!-- ── Tab bar ─────────────────────────────────────────────────────────── -->
 <div class="flex gap-1 mb-4 overflow-x-auto pb-1 hide-scrollbar">
     {% for tid, tlabel, tcount, ticon, tcolor in tabs %}
