@@ -90,6 +90,9 @@ See `.env.example` for the canonical, commented list. Highlights:
 | `GMAIL_RECIPIENT_ALLOWLIST` | Comma-separated emails (`alice@example.com`) or domains (`@company.com`). When set, the `gmail send` skill refuses to email anyone not on the list. Empty = no restriction. |
 | `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `XAI_API_KEY` / `GOOGLE_API_KEY` | At least one required (or use Ollama for fully self-hosted). |
 | `DEFAULT_PROVIDER` | `anthropic` (default) / `openai` / `xai` / `google` / `ollama`. |
+| `MEMORY_BACKEND` | `internal`, `supermemory`, or `tandem` (default in this branch). See `docs/SUPERMEMORY.md`. |
+| `SUPERMEMORY_API_KEY` / `SUPERMEMORY_BASE_URL` | Optional hosted/local Supermemory backend credentials. Use `http://localhost:6767` for self-hosted local Supermemory. |
+| `SUPERMEMORY_CONTEXT_BUDGET_CHARS` / `SUPERMEMORY_TIMEOUT_SECONDS` | Bounds Supermemory context injection and latency so tandem mode does not bloat prompts. |
 | `LOG_LEVEL` | `INFO` (default), `DEBUG`, `WARNING`. |
 | `SOVEREIGN_MODE` | `true` (default) — full skill round budget + operator prime block. |
 | `WASP_HOST_DIR` | Path on the host where WASP is installed. Used by the agent's self-repair prompts so they reference the correct rebuild directory. The installer / wizard sets this automatically. |

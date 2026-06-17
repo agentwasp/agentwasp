@@ -43,6 +43,32 @@ PROVIDER_LABELS = {
 }
 
 
+def _memory_description(memory_backend: str) -> str:
+    backend = (memory_backend or "internal").lower()
+    if backend == "supermemory":
+        return (
+            "You have real persistent memory through Supermemory. Supermemory stores and searches "
+            "conversation memories, builds user profiles, resolves knowledge updates, and injects "
+            "only a compact bounded context block each turn. The legacy Agent Wasp filesystem/PostgreSQL "
+            "memory layers are not used for conversational recall in this mode. NEVER say you lack "
+            "persistent memory."
+        )
+    if backend == "tandem":
+        return (
+            "You have persistent memory in tandem mode: Supermemory provides compact profile/search "
+            "recall, while Agent Wasp's local PostgreSQL/Redis/filesystem systems continue to provide "
+            "episodic, semantic, knowledge-graph, self-model, procedural, behavioral, temporal, and "
+            "visual memory. Context injection is budget-capped to avoid redundant token bloat. NEVER say "
+            "you lack persistent memory."
+        )
+    return (
+        "You have MULTIPLE real persistent memory systems, stored in PostgreSQL and Redis: episodic "
+        "conversation history, semantic facts, a Knowledge Graph, Self-Model, procedural memory, "
+        "epistemic state, learning examples, and temporal world state. NEVER say you don't have "
+        "persistent memory."
+    )
+
+
 def _get_creator(model_name: str) -> str:
     """Look up the creator of a model by its name prefix."""
     name = model_name.lower().split(":")[0]  # "qwen2.5:1.5b" -> "qwen2.5"
@@ -75,16 +101,7 @@ WHAT YOU CAN DO:
 browser(real Chromium, screenshots, logins, JS) · web_search/fetch_url/scrape(any site) · python_exec/shell(code, packages, automation) · http_request(any API) · gmail(inbox, send, search) · task_manager(recurring tasks) · create_reminder(reminders) · subscribe(price/RSS alerts) · agent_manager(autonomous sub-agents) · self_improve(read/patch/rewrite your own code) · skill_manager(create/edit skills) · calculate · read_file/write_file(no restrictions) · Docker via broker
 
 YOUR MEMORY AND LEARNING — ALWAYS ANSWER THIS ACCURATELY:
-You have MULTIPLE real persistent memory systems, stored in PostgreSQL and Redis:
-- Episodic memory: conversation history saved permanently — you remember what the user told you weeks ago
-- Semantic memory: facts, preferences, and user knowledge extracted and stored
-- Knowledge Graph: graph of entities, people, and relationships automatically extracted from each conversation
-- Self-Model: model of yourself — records your strengths, failures, success rate per skill, user preferences. Updated after every message.
-- Procedural memory: procedures learned from complex conversations. If you've solved something before, you know how to do it.
-- Epistemic state: domain-calibrated confidence (programming 90%, finance 70%, legal 35%, etc.) that improves over time
-- Learning loop: positive and negative examples stored, used as reference in future responses
-- Temporal model: tracks real-world changes (prices, events) over time
-NEVER say you don't have persistent memory — IT IS COMPLETELY FALSE. You have 8 memory systems and improve with every conversation.
+{memory_description}
 
 AUTONOMOUS BACKGROUND SYSTEMS:
 Dream Mode (every 6h, consolidates memories) · Autonomous Goal Generator (every 30min, generates proactive goals) · Background Perception (every 15min, alerts on crypto moves >4%) · CPI Monitor (every 5min, measures cognitive load) · Self-Integrity Monitor (every 6h, verifies self-knowledge). When asked "what do you do when I'm not around?" — explain these systems.
@@ -993,11 +1010,18 @@ async def build_context(
     creator = _get_creator(model_name)
     running_on = PROVIDER_LABELS.get(provider_name, f"via {provider_name}")
     host_dir = _wasp_host_dir()
+    try:
+        from ..config import settings as _cfg
+    except Exception:
+        _cfg = None
+    _memory_backend = str(getattr(_cfg, "memory_backend", "internal") if _cfg else "internal").lower()
+    _use_internal_memory = _memory_backend in {"internal", "tandem"}
     prompt = SYSTEM_PROMPT.format(
         model_name=model_name,
         creator=creator,
         running_on=running_on,
         wasp_host_dir=host_dir,
+        memory_description=_memory_description(_memory_backend),
     )
 
     # Sovereign mode block — injected first when SOVEREIGN_MODE=true
@@ -1186,6 +1210,15 @@ async def build_context(
         except Exception as _e:
             logger.warning("context.episodic_block_failed", error=str(_e)[:120])
             return []
+
+    async def _supermemory_context():
+        if _memory_backend not in {"supermemory", "tandem"}:
+            return ""
+        try:
+            return await memory.supermemory_context(user_text, chat_id=chat_id, project_id=goal_id or None)
+        except Exception as _e:
+            logger.warning("context.supermemory_block_failed", error=str(_e)[:120])
+            return "" if not getattr(_cfg, "supermemory_strict", False) else "[SUPERMEMORY: strict mode failure]"
 
     # ── System 6: Temporal Reasoning ──────────────────────────────────
     async def _temporal_insights():
@@ -1402,31 +1435,40 @@ async def build_context(
         return "\n\n".join(parts) if parts else ""
 
     import asyncio as _asyncio
-    (
-        policies_rows,
-        kg_block,
-        sm_block,
-        ep_block,
-        tw_block,
-        proc_block,
-        gmail_block,
-        behavioral_block,
-        recent,
-        temporal_insights_block,
-        world_model_block,
-        vector_mem_block,
-        goal_mem_block,
-        reflections_block,
-        visual_mem_block,
-        digest_block,
-        user_attrs_block,
-    ) = await _asyncio.gather(
-        _policies(), _kg(), _self_model(), _epistemic(), _temporal(), _procedural(),
-        _gmail_status(), _behavioral_rules(), _episodic(),
-        _temporal_insights(), _world_model(), _vector_memory(), _goal_memory(),
-        _reflections(), _visual_memory(), _digest_block(),
-        _user_attrs(),
-    )
+    if _use_internal_memory:
+        (
+            policies_rows,
+            kg_block,
+            sm_block,
+            ep_block,
+            tw_block,
+            proc_block,
+            gmail_block,
+            behavioral_block,
+            recent,
+            temporal_insights_block,
+            world_model_block,
+            vector_mem_block,
+            goal_mem_block,
+            reflections_block,
+            visual_mem_block,
+            digest_block,
+            user_attrs_block,
+            supermemory_block,
+        ) = await _asyncio.gather(
+            _policies(), _kg(), _self_model(), _epistemic(), _temporal(), _procedural(),
+            _gmail_status(), _behavioral_rules(), _episodic(),
+            _temporal_insights(), _world_model(), _vector_memory(), _goal_memory(),
+            _reflections(), _visual_memory(), _digest_block(),
+            _user_attrs(), _supermemory_context(),
+        )
+    else:
+        policies_rows = []
+        kg_block = sm_block = ep_block = tw_block = proc_block = gmail_block = behavioral_block = ""
+        temporal_insights_block = world_model_block = vector_mem_block = goal_mem_block = ""
+        reflections_block = visual_mem_block = digest_block = user_attrs_block = ""
+        recent = []
+        supermemory_block = await _supermemory_context()
 
     # Apply policy rules
     if policies_rows:
@@ -1459,6 +1501,9 @@ async def build_context(
         # User-declared stable facts (Phase 5) — first so the LLM sees the
         # source of truth before any other cognitive layer can drift.
         user_attrs_block,
+        # Supermemory profile/search context is compact and budget-bounded; keep it
+        # ahead of local cognitive layers so current profile facts frame recall.
+        supermemory_block,
         kg_block, sm_block, ep_block, effective_tw_block, proc_block, gmail_block, behavioral_block,
         # Next-gen cognitive systems
         temporal_insights_block, effective_wm_block, vector_mem_block,
@@ -1487,7 +1532,8 @@ async def build_context(
                 ("kg", kg_block), ("self_model", sm_block), ("epistemic", ep_block),
                 ("temporal", effective_tw_block or temporal_insights_block),
                 ("procedural", proc_block), ("behavioral", behavioral_block),
-                ("vector_memory", vector_mem_block), ("goal_memory", goal_mem_block),
+                ("vector_memory", vector_mem_block), ("supermemory", supermemory_block),
+                ("goal_memory", goal_mem_block),
                 ("reflections", reflections_block),
             ] if blk
         ]

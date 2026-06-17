@@ -20,6 +20,8 @@ _PATTERNS: list[tuple[re.Pattern, str]] = [
     (re.compile(r'\bxai-[A-Za-z0-9_-]{20,}\b'), 'xai-***REDACTED***'),
     # Moonshot / Kimi
     (re.compile(r'\bsk-[A-Za-z0-9]{40,}\b'), 'sk-***REDACTED***'),
+    # Supermemory API keys
+    (re.compile(r'\bsm_[A-Za-z0-9_-]{20,}\b'), 'sm_***REDACTED***'),
     # HuggingFace — hf_...
     (re.compile(r'\bhf_[A-Za-z0-9]{20,}\b'), 'hf_***REDACTED***'),
     # Generic Bearer tokens in HTTP headers/text

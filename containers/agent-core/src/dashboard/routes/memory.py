@@ -1,7 +1,7 @@
 """Memory Hub — all memory layers in one place."""
 
 from fastapi import APIRouter, Query, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from sqlalchemy import desc, func, select
 
 from ...db.models import (
@@ -134,8 +134,14 @@ async def memory_list(
             kg_node_names = {n.id: n.name for n in kg_nodes}
             kg_node_names.update({row.id: row.name for row in extra_nodes})
 
+    if getattr(memory, "backend", "internal") == "supermemory":
+        stats = memory.get_stats()
+
     return request.app.state.templates.TemplateResponse(request, "memory.html", {
         "stats":         stats,
+        "memory_backend": getattr(memory, "backend", "internal"),
+        "supermemory_status": memory.supermemory_status() if hasattr(memory, "supermemory_status") else {},
+        "migration_preview": memory.migration_preview() if hasattr(memory, "migration_preview") else {},
         "current_type":  type,
         "search":        search,
         "page":          page,
@@ -150,6 +156,34 @@ async def memory_list(
         "kg_relations":  kg_relations,
         "kg_node_names": kg_node_names,
     })
+
+
+@router.get("/api/supermemory/migration-preview")
+async def supermemory_migration_preview(request: Request, limit: int = Query(default=500, ge=1, le=5000)):
+    memory = request.app.state.memory
+    if not hasattr(memory, "migration_preview"):
+        return JSONResponse({"ok": False, "error": "memory manager does not support migration preview"}, status_code=404)
+    return JSONResponse({"ok": True, "preview": memory.migration_preview(limit=limit)})
+
+
+@router.post("/api/supermemory/migrate")
+async def supermemory_migrate(request: Request):
+    memory = request.app.state.memory
+    body = await request.json()
+    direction = body.get("direction", "internal_to_supermemory")
+    dry_run = bool(body.get("dry_run", True))
+    limit = int(body.get("limit", 500) or 500)
+    chat_id = str(body.get("chat_id", "") or "")
+    project_id = body.get("project_id") or None
+    async with async_session() as session:
+        if direction == "internal_to_supermemory" and hasattr(memory, "export_internal_to_supermemory"):
+            result = await memory.export_internal_to_supermemory(session, limit=limit, dry_run=dry_run, chat_id=chat_id, project_id=project_id)
+        elif direction == "supermemory_to_internal" and hasattr(memory, "import_supermemory_to_internal"):
+            result = await memory.import_supermemory_to_internal(session, limit=limit, dry_run=dry_run, chat_id=chat_id, project_id=project_id)
+        else:
+            return JSONResponse({"ok": False, "error": "unknown migration direction"}, status_code=400)
+    status_code = 200 if result.get("ok", False) or dry_run else 500
+    return JSONResponse({"ok": bool(result.get("ok", False)), "result": result}, status_code=status_code)
 
 
 @router.get("/{memory_type}/{memory_id}", response_class=HTMLResponse)

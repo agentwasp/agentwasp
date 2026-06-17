@@ -49,6 +49,23 @@ You need **at least one** of:
 
 Or set `DEFAULT_PROVIDER=local` and pull a model with `docker exec agent-ollama ollama pull <model>`.
 
+## Memory backend
+
+Agent Wasp supports three memory strategies. `tandem` is the safest Supermemory evaluation mode because it keeps local KG/procedural/temporal memory while adding a capped Supermemory profile/search block.
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `MEMORY_BACKEND` | `tandem` | `internal`, `supermemory`, or `tandem`. |
+| `SUPERMEMORY_API_KEY` | empty | Hosted/local Supermemory API key. Required for `supermemory` or `tandem`. |
+| `SUPERMEMORY_BASE_URL` | `https://api.supermemory.ai` | Use `http://localhost:6767` for self-hosted local Supermemory. |
+| `SUPERMEMORY_CONTAINER_TAG` | `agentwasp` | Base container tag / namespace. |
+| `SUPERMEMORY_SCOPE` | `chat` | `chat` prevents cross-chat leakage; `project`/`global` widen recall. |
+| `SUPERMEMORY_TIMEOUT_SECONDS` | `1.5` | Hard latency budget for context retrieval. |
+| `SUPERMEMORY_CONTEXT_BUDGET_CHARS` | `1800` | Max Supermemory text injected into the system prompt. |
+| `SUPERMEMORY_SEARCH_LIMIT` | `3` | Max recall items from profile/search. |
+
+See `docs/SUPERMEMORY.md` in the repository for the full mode comparison and security notes.
+
 ## Integrations (optional)
 
 | Variable | Purpose |

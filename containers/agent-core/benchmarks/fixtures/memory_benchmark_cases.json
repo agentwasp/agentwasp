@@ -1,0 +1,215 @@
+{
+  "schema": "agentwasp-memory-benchmark-v1",
+  "description": "Synthetic, non-secret memory benchmark cases for comparing AgentWASP internal recent episodic recall, Supermemory scoped recall, and tandem recall with the same local reader model.",
+  "internal_recent_turn_limit": 6,
+  "cases": [
+    {
+      "id": "long_pref_color",
+      "category": "long_horizon_recall",
+      "question": "What color notebook does Maris prefer?",
+      "expected": ["sapphire blue"],
+      "forbidden": ["amber orange"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 14, "content": "Maris prefers sapphire blue notebooks for planning sessions."},
+        {"chat": "primary", "turns_ago": 3, "content": "Maris asked about a calendar export, unrelated to notebooks."},
+        {"chat": "other", "turns_ago": 2, "content": "A different user prefers amber orange notebooks."}
+      ]
+    },
+    {
+      "id": "long_project_path",
+      "category": "long_horizon_recall",
+      "question": "What is the project archive path for the Finch demo?",
+      "expected": ["/srv/agentwasp/finch/archive"],
+      "forbidden": ["/tmp/finch/archive"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 18, "content": "The Finch demo project archive path is /srv/agentwasp/finch/archive."},
+        {"chat": "primary", "turns_ago": 2, "content": "The Finch demo UI uses a green status pill."},
+        {"chat": "other", "turns_ago": 1, "content": "A throwaway Finch sandbox path was /tmp/finch/archive."}
+      ]
+    },
+    {
+      "id": "long_client_code",
+      "category": "long_horizon_recall",
+      "question": "Which client code belongs to the Cedar beta?",
+      "expected": ["CEDAR-731"],
+      "forbidden": ["CEDAR-137"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 12, "content": "The Cedar beta client code is CEDAR-731."},
+        {"chat": "primary", "turns_ago": 1, "content": "Cedar beta notes should be summarized in one paragraph."},
+        {"chat": "other", "turns_ago": 4, "content": "A rejected Cedar test code was CEDAR-137."}
+      ]
+    },
+    {
+      "id": "recent_invoice_channel",
+      "category": "recent_recall_control",
+      "question": "Where should Nova invoices be sent?",
+      "expected": ["billing-nova@example.test"],
+      "forbidden": ["ops-nova@example.test"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 3, "content": "Nova invoices should be sent to billing-nova@example.test."},
+        {"chat": "other", "turns_ago": 1, "content": "Nova operational alerts go to ops-nova@example.test."}
+      ]
+    },
+    {
+      "id": "recent_deploy_window",
+      "category": "recent_recall_control",
+      "question": "What deployment window did Orion approve?",
+      "expected": ["02:00 UTC"],
+      "forbidden": ["20:00 UTC"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 2, "content": "Orion approved the deployment window at 02:00 UTC."},
+        {"chat": "other", "turns_ago": 2, "content": "Another team uses a 20:00 UTC maintenance window."}
+      ]
+    },
+    {
+      "id": "temporal_preference_update",
+      "category": "temporal_update",
+      "question": "What is Jules's current dashboard density preference?",
+      "expected": ["compact"],
+      "forbidden": ["spacious"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 16, "content": "Jules originally preferred spacious dashboard density."},
+        {"chat": "primary", "turns_ago": 5, "content": "Update: Jules now prefers compact dashboard density. Treat compact as the current preference."}
+      ]
+    },
+    {
+      "id": "temporal_contact_update",
+      "category": "temporal_update",
+      "question": "What is Priya's current escalation channel?",
+      "expected": ["pager-priya@example.test"],
+      "forbidden": ["sms-priya@example.test"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 17, "content": "Priya's old escalation channel was sms-priya@example.test."},
+        {"chat": "primary", "turns_ago": 4, "content": "Current update: Priya's escalation channel is pager-priya@example.test."}
+      ]
+    },
+    {
+      "id": "stale_premise_card",
+      "category": "stale_memory",
+      "question": "Should we still bill the Lyra card ending 1404?",
+      "expected": ["no", "archived"],
+      "forbidden": ["yes", "active"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 15, "content": "Lyra card ending 1404 was once the active billing card."},
+        {"chat": "primary", "turns_ago": 6, "content": "Important update: Lyra card ending 1404 was archived and must not be billed anymore."}
+      ]
+    },
+    {
+      "id": "multi_hop_city_badge",
+      "category": "multi_hop",
+      "question": "Give the venue city and badge code for the Quill workshop.",
+      "expected": ["Lisbon", "QW-88"],
+      "forbidden": ["Madrid", "QW-44"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 13, "content": "The Quill workshop venue city is Lisbon."},
+        {"chat": "primary", "turns_ago": 11, "content": "The Quill workshop badge code is QW-88."},
+        {"chat": "other", "turns_ago": 3, "content": "A different Quill rehearsal in Madrid used badge code QW-44."}
+      ]
+    },
+    {
+      "id": "multi_hop_owner_secretary",
+      "category": "multi_hop",
+      "question": "Who owns the Atlas checklist and what review word should appear in the handoff?",
+      "expected": ["Ren", "lighthouse"],
+      "forbidden": ["Mika", "harbor"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 12, "content": "Ren owns the Atlas checklist."},
+        {"chat": "primary", "turns_ago": 10, "content": "The Atlas handoff review word is lighthouse."},
+        {"chat": "other", "turns_ago": 2, "content": "Mika owns a different checklist whose review word is harbor."}
+      ]
+    },
+    {
+      "id": "cross_chat_guardrail",
+      "category": "scope_isolation",
+      "question": "What is the Hopper staging password hint?",
+      "expected": ["UNKNOWN"],
+      "forbidden": ["blue-river"],
+      "abstain": true,
+      "facts": [
+        {"chat": "other", "turns_ago": 1, "content": "The other chat's Hopper staging password hint is blue-river."},
+        {"chat": "primary", "turns_ago": 2, "content": "Primary chat discussed Hopper staging layout but no password hint."}
+      ]
+    },
+    {
+      "id": "unanswerable_missing_fact",
+      "category": "abstention",
+      "question": "What is the Zinnia launch passphrase?",
+      "expected": ["UNKNOWN"],
+      "forbidden": ["zinnia", "passphrase is"],
+      "abstain": true,
+      "facts": [
+        {"chat": "primary", "turns_ago": 4, "content": "Zinnia launch planning happened, but no passphrase was recorded."},
+        {"chat": "other", "turns_ago": 3, "content": "Another project had a passphrase, not Zinnia."}
+      ]
+    },
+    {
+      "id": "noise_distractor_color",
+      "category": "distractor_robustness",
+      "question": "Which alert color did Tessa select for sev2 incidents?",
+      "expected": ["violet"],
+      "forbidden": ["yellow", "red"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 20, "content": "Tessa selected violet for sev2 incident alerts."},
+        {"chat": "primary", "turns_ago": 3, "content": "Tessa selected yellow for documentation callouts, not incidents."},
+        {"chat": "primary", "turns_ago": 2, "content": "Tessa selected red for sev1 incident alerts."}
+      ]
+    },
+    {
+      "id": "noise_owner_collision",
+      "category": "distractor_robustness",
+      "question": "Who is the owner for the Rook migration?",
+      "expected": ["Elian"],
+      "forbidden": ["Sora", "Noor"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 19, "content": "Elian is the owner for the Rook migration."},
+        {"chat": "primary", "turns_ago": 4, "content": "Sora is the owner for the Rook design review, not migration."},
+        {"chat": "primary", "turns_ago": 1, "content": "Noor is the owner for the Rook billing review, not migration."}
+      ]
+    },
+    {
+      "id": "procedure_recall",
+      "category": "procedure_recall",
+      "question": "What two-step process should be used before publishing the Pearl note?",
+      "expected": ["redact", "screenshot"],
+      "forbidden": ["publish immediately"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 16, "content": "Pearl note publishing process: first redact private names, then capture a final screenshot."},
+        {"chat": "primary", "turns_ago": 2, "content": "Do not publish the Pearl note immediately."}
+      ]
+    },
+    {
+      "id": "numeric_budget",
+      "category": "exact_value_recall",
+      "question": "What token budget did the Kestrel profile context get?",
+      "expected": ["1800"],
+      "forbidden": ["800", "2800"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 14, "content": "The Kestrel profile context budget is 1800 characters."},
+        {"chat": "primary", "turns_ago": 5, "content": "The Kestrel shell timeout is 800 milliseconds, unrelated to profile context."},
+        {"chat": "other", "turns_ago": 4, "content": "A different project used a 2800 character profile context budget."}
+      ]
+    },
+    {
+      "id": "current_status_negative",
+      "category": "temporal_update",
+      "question": "Is the Moth demo currently approved for public release?",
+      "expected": ["no", "internal only"],
+      "forbidden": ["yes", "public release approved"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 18, "content": "The Moth demo was tentatively approved for public release."},
+        {"chat": "primary", "turns_ago": 4, "content": "Latest status: the Moth demo is internal only and not approved for public release."}
+      ]
+    },
+    {
+      "id": "chat_scope_positive",
+      "category": "scope_isolation",
+      "question": "What is the primary chat's Delta workspace label?",
+      "expected": ["delta-north"],
+      "forbidden": ["delta-south"],
+      "facts": [
+        {"chat": "primary", "turns_ago": 8, "content": "The primary chat's Delta workspace label is delta-north."},
+        {"chat": "other", "turns_ago": 1, "content": "The other chat's Delta workspace label is delta-south."}
+      ]
+    }
+  ]
+}

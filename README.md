@@ -71,7 +71,7 @@ wasp health      # run health probes
 
 ## What WASP does
 
-- **Layered persistent memory** across 28 PostgreSQL tables and Redis: episodic, semantic, working, procedural, behavioral rules, knowledge graph, temporal world model, vector embeddings, goal-scoped, self-model, per-domain epistemic confidence. Persists across sessions, reboots, and model switches.
+- **Layered persistent memory** across 28 PostgreSQL tables and Redis, with optional Supermemory hosted/local backend modes: `internal`, `supermemory`, or `tandem`. Tandem mode caps Supermemory profile/search context so it can improve long-horizon recall without flooding prompts or adding uncontrolled latency. See [Supermemory backends](docs/SUPERMEMORY.md) and the [memory benchmark harness](docs/MEMORY_BENCHMARKS.md).
 - **37 built-in skills**: web search, browser automation (nodriver + Selenium), email (Gmail with allowlist), scraping, scheduling, file ops, Python execution (sandboxed), reminders, RSS subscriptions, monitoring, self-improvement, and more.
 - **Goal orchestrator** with **Plan Critic**: long-running plans broken into TaskGraph steps, validated by an LLM critic before execution, retried on failure, replanned when blocked.
 - **Capability tiers per skill** (4 explicit levels: PUBLIC / CONTROLLED / RESTRICTED / PRIVILEGED) with **anticipatory simulation** that previews consequences before privileged operations.

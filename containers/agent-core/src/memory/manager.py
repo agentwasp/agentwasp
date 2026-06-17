@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta, timezone
 
 import structlog
@@ -24,12 +25,36 @@ class MemoryManager:
     """
 
     def __init__(self):
+        from ..config import settings
+        from .supermemory_client import SupermemoryClient
+
+        self.backend = str(getattr(settings, "memory_backend", "internal") or "internal").lower()
         self.store = MemoryStore()
         self.index = MemoryIndex()
         self.snapshots = SnapshotManager(self.store)
         self.promotion = PromotionEngine(self)
         self.forgetting = ForgettingEngine(self)
         self.context_builder = ContextBuilder(self)
+        self.supermemory = SupermemoryClient.from_settings(settings)
+
+    @property
+    def use_internal_store(self) -> bool:
+        return self.backend in {"internal", "tandem"}
+
+    @property
+    def use_supermemory(self) -> bool:
+        return self.backend in {"supermemory", "tandem"}
+
+    async def supermemory_context(self, user_text: str, chat_id: str = "", project_id: str | None = None) -> str:
+        if not self.use_supermemory:
+            return ""
+        return await self.supermemory.format_context(user_text, chat_id=chat_id, project_id=project_id)
+
+    def supermemory_status(self) -> dict:
+        status = self.supermemory.status()
+        status["backend"] = self.backend
+        status["mode"] = "supermemory-only" if self.backend == "supermemory" else self.backend
+        return status
 
     async def store_memory(
         self,
@@ -57,9 +82,42 @@ class MemoryManager:
             source=source,
         )
 
+        if self.backend == "supermemory":
+            await self.supermemory.create_memory(
+                summary or json.dumps(content, ensure_ascii=False),
+                project_id=project_id,
+                metadata={
+                    "memory_type": memory_type.value,
+                    "tags": ",".join(tags or []),
+                    "source": source,
+                    "importance": importance,
+                },
+                is_static=memory_type in {MemoryType.FACTS, MemoryType.POLICY},
+            )
+            logger.info(
+                "memory.supermemory_only_stored",
+                memory_type=memory_type,
+                summary=summary[:80] if summary else "",
+            )
+            return entry
+
         file_path = self.store.write(entry)
         content_hash = self.store.content_hash(entry)
         await self.index.upsert(session, entry, file_path, content_hash)
+
+        if self.backend == "tandem" and memory_type != MemoryType.EPISODIC:
+            await self.supermemory.create_memory(
+                summary or json.dumps(content, ensure_ascii=False),
+                project_id=project_id,
+                metadata={
+                    "memory_type": memory_type.value,
+                    "tags": ",".join(tags or []),
+                    "source": source,
+                    "importance": importance,
+                    "internal_memory_id": entry.id,
+                },
+                is_static=memory_type in {MemoryType.FACTS, MemoryType.POLICY},
+            )
 
         logger.info(
             "memory.stored",
@@ -105,6 +163,20 @@ class MemoryManager:
         self, session: AsyncSession, query: MemoryQuery
     ) -> list[MemoryContent]:
         """Search memory using the PostgreSQL index, then load from filesystem."""
+        if self.backend == "supermemory":
+            query_text = query.text_search or (query.memory_type.value if query.memory_type else "recent memory")
+            block = await self.supermemory.format_context(query_text, project_id=query.project_id)
+            if not block:
+                return []
+            return [MemoryContent(
+                memory_type=query.memory_type or MemoryType.SEMANTIC,
+                project_id=query.project_id,
+                tags=query.tags + ["supermemory"],
+                summary=block[:240],
+                content={"source": "supermemory", "text": block},
+                source="supermemory",
+            )]
+
         rows = await self.index.search(session, query)
         entries = []
         for row in rows:
@@ -203,6 +275,50 @@ class MemoryManager:
         content is lost. Each chunk references the original turn via tags.
         Automatically triggers the PromotionEngine to scan for recurring topics.
         """
+        if self.backend == "supermemory":
+            timestamp = datetime.now(timezone.utc).isoformat()
+            content_text = (
+                f"event_type: {event_type}\n"
+                f"user_id: {user_id}\n"
+                f"chat_id: {chat_id}\n"
+                f"timestamp: {timestamp}\n\n"
+                f"user: {user_input}\nassistant: {agent_response}"
+            )
+            entry = MemoryContent(
+                memory_type=MemoryType.EPISODIC,
+                tags=list(tags or ["conversation"]) + ([f"chat:{chat_id}"] if chat_id else []),
+                summary=f"User: {user_input[:120]}",
+                content={
+                    "event_type": event_type,
+                    "user_id": user_id,
+                    "chat_id": chat_id,
+                    "user_input": user_input,
+                    "agent_response": agent_response,
+                    "timestamp": timestamp,
+                    "supermemory_only": True,
+                },
+                importance_score=self._compute_importance(user_input, agent_response, skills_used),
+                source="supermemory",
+            )
+            # Use exact `/v4/memories` ingestion for conversation turns. The
+            # document extraction path is still available via add_document(),
+            # but exact memory writes are lower-latency and work reliably with
+            # self-hosted/local Supermemory deployments whose extraction agent
+            # may be weaker than the main chat model.
+            await self.supermemory.create_memory(
+                content_text,
+                chat_id=chat_id,
+                metadata={
+                    "event_type": event_type,
+                    "user_id": user_id,
+                    "chat_id": chat_id,
+                    "skills_used": ",".join(skills_used or []),
+                    "internal_memory_id": entry.id,
+                    "ingest_mode": "exact_memory",
+                },
+            )
+            return entry
+
         all_tags = list(tags or ["conversation"])
         if skills_used:
             all_tags.append("skill_used")
@@ -299,6 +415,26 @@ class MemoryManager:
             except Exception:
                 logger.warning("memory.promotion_analysis_failed", entry_id=last_entry.id)
 
+        if self.backend == "tandem" and last_entry:
+            await self.supermemory.create_memory(
+                (
+                    f"event_type: {event_type}\n"
+                    f"user_id: {user_id}\n"
+                    f"chat_id: {chat_id}\n"
+                    f"timestamp: {timestamp}\n\n"
+                    f"user: {user_input}\nassistant: {agent_response}"
+                ),
+                chat_id=chat_id,
+                metadata={
+                    "event_type": event_type,
+                    "user_id": user_id,
+                    "chat_id": chat_id,
+                    "internal_memory_id": last_entry.id,
+                    "skills_used": ",".join(skills_used or []),
+                    "ingest_mode": "exact_memory",
+                },
+            )
+
         return last_entry
 
     async def get_context_packet(
@@ -314,11 +450,140 @@ class MemoryManager:
             max_interactions=max_interactions,
         )
 
+    def migration_preview(self, limit: int = 500) -> dict:
+        """Return a safe local preview for memory backend migration."""
+        entries = self.store.list_all() if self.use_internal_store else []
+        clipped = entries[: max(0, int(limit or 0))]
+        by_type = {mt.value: 0 for mt in MemoryType}
+        total_chars = 0
+        for entry in clipped:
+            by_type[entry.memory_type.value] = by_type.get(entry.memory_type.value, 0) + 1
+            total_chars += len(entry.summary or "") + len(json.dumps(entry.content, ensure_ascii=False))
+        return {
+            "backend": self.backend,
+            "internal_enabled": self.use_internal_store,
+            "supermemory_enabled": self.use_supermemory,
+            "internal_total": len(entries),
+            "preview_count": len(clipped),
+            "by_type": by_type,
+            "estimated_payload_chars": total_chars,
+            "supermemory": self.supermemory_status(),
+            "directions": [
+                {
+                    "key": "internal_to_supermemory",
+                    "label": "Internal → Supermemory",
+                    "status": "available" if self.supermemory.configured and entries else "needs_configuration_or_memory",
+                    "note": "Copies local Agent Wasp memory entries into scoped Supermemory exact memories without deleting local data.",
+                },
+                {
+                    "key": "supermemory_to_internal",
+                    "label": "Supermemory → Internal",
+                    "status": "available" if self.supermemory.configured and self.use_internal_store else "needs_configuration_or_internal_store",
+                    "note": "Imports listed Supermemory memories back into Agent Wasp JSON/PostgreSQL memory as rollback/portability entries.",
+                },
+            ],
+        }
+
+    async def export_internal_to_supermemory(
+        self,
+        session: AsyncSession,
+        *,
+        limit: int = 500,
+        dry_run: bool = True,
+        chat_id: str = "",
+        project_id: str | None = None,
+    ) -> dict:
+        """Copy internal memory entries into Supermemory exact memories."""
+        entries = self.store.list_all()[: max(0, min(int(limit or 500), 5000))]
+        if not self.supermemory.configured:
+            return {"ok": False, "error": "Supermemory is not configured", "dry_run": dry_run, "planned": len(entries), "copied": 0}
+        copied = 0
+        failures: list[str] = []
+        for entry in entries:
+            summary = entry.summary or json.dumps(entry.content, ensure_ascii=False)[:500]
+            payload_text = (
+                f"memory_type: {entry.memory_type.value}\n"
+                f"source: agentwasp-internal\n"
+                f"created_at: {entry.created_at}\n"
+                f"tags: {', '.join(entry.tags)}\n\n"
+                f"summary: {summary}\n"
+                f"content: {json.dumps(entry.content, ensure_ascii=False)}"
+            )
+            if dry_run:
+                copied += 1
+                continue
+            result = await self.supermemory.create_memory(
+                payload_text,
+                chat_id=chat_id,
+                project_id=project_id or entry.project_id,
+                metadata={
+                    "migration": "internal_to_supermemory",
+                    "internal_memory_id": entry.id,
+                    "memory_type": entry.memory_type.value,
+                    "source": entry.source,
+                    "tags": ",".join(entry.tags),
+                },
+                is_static=entry.memory_type in {MemoryType.FACTS, MemoryType.POLICY},
+            )
+            if result.get("ok"):
+                copied += 1
+            else:
+                failures.append(str(result.get("error") or result.get("reason") or "unknown")[:160])
+        return {"ok": not failures, "dry_run": dry_run, "planned": len(entries), "copied": copied, "failed": len(failures), "failures": failures[:5]}
+
+    async def import_supermemory_to_internal(
+        self,
+        session: AsyncSession,
+        *,
+        limit: int = 100,
+        dry_run: bool = True,
+        chat_id: str = "",
+        project_id: str | None = None,
+    ) -> dict:
+        """Import listed Supermemory memories into the internal store/index."""
+        if not self.supermemory.configured:
+            return {"ok": False, "error": "Supermemory is not configured", "dry_run": dry_run, "planned": 0, "imported": 0}
+        try:
+            data = await self.supermemory.list_memories(chat_id=chat_id, project_id=project_id, limit=limit)
+        except Exception as exc:
+            return {"ok": False, "error": str(exc).splitlines()[0][:160], "dry_run": dry_run, "planned": 0, "imported": 0}
+        items = data.get("memoryEntries") or data.get("memories") or []
+        imported = 0
+        for item in items[: max(0, min(int(limit or 100), 1000))]:
+            text = item.get("memory") or item.get("content") if isinstance(item, dict) else str(item)
+            if not text:
+                continue
+            imported += 1
+            if dry_run:
+                continue
+            entry = MemoryContent(
+                memory_type=MemoryType.SEMANTIC,
+                project_id=project_id,
+                tags=["supermemory-import", "migration"],
+                summary=str(text)[:240],
+                content={"source": "supermemory", "text": str(text), "supermemory_id": item.get("id") if isinstance(item, dict) else None},
+                source="supermemory-import",
+            )
+            file_path = self.store.write(entry)
+            content_hash = self.store.content_hash(entry)
+            await self.index.upsert(session, entry, file_path, content_hash)
+        return {"ok": True, "dry_run": dry_run, "planned": len(items), "imported": imported, "pagination": data.get("pagination")}
+
     def get_stats(self) -> dict:
         """Get memory statistics."""
-        stats = {"total": self.store.count(), "size_bytes": self.store.total_size_bytes()}
+        if self.backend == "supermemory":
+            stats: dict = {"total": 0, "size_bytes": 0}
+            for mt in MemoryType:
+                stats[mt.value] = 0
+            stats["backend"] = "supermemory"
+            stats["supermemory"] = self.supermemory_status()
+            return stats
+
+        stats: dict = {"total": self.store.count(), "size_bytes": self.store.total_size_bytes()}
         for mt in MemoryType:
             stats[mt.value] = self.store.count(mt)
+        stats["backend"] = self.backend
+        stats["supermemory"] = self.supermemory_status()
         return stats
 
     def create_snapshot(self, label: str, trigger: str = "manual") -> SnapshotInfo:

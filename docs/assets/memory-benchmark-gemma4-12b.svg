@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="420" viewBox="0 0 920 420" role="img" aria-labelledby="title desc">
+<title id="title">AgentWASP Gemma 4 12B memory benchmark</title>
+<desc id="desc">Bar chart comparing internal, Supermemory, and tandem memory backends on answer accuracy and retrieval support.</desc>
+<rect width="100%" height="100%" rx="24" fill="#080b12"/>
+<text x="36" y="46" fill="#f8fafc" font-family="Inter,Arial" font-size="24" font-weight="700">AgentWASP Memory Benchmark · Gemma 4 12B</text>
+<text x="36" y="74" fill="#94a3b8" font-family="Inter,Arial" font-size="13">18 synthetic non-secret cases · local Supermemory at 127.0.0.1:8787 · same reader/model/prompt across backends</text>
+<text x="36" y="143" fill="#e2e8f0" font-family="Inter,Arial" font-size="17" font-weight="700">Answer accuracy</text>
+<line x1="160" y1="168" x2="720" y2="168" stroke="#1f2937"/>
+<text x="146" y="195" text-anchor="end" fill="#cbd5e1" font-family="Inter,Arial" font-size="13">internal</text>
+<rect x="160" y="172" width="560" height="34" rx="9" fill="#111827"/>
+<rect x="160" y="172" width="248.9" height="34" rx="9" fill="#8b949e" opacity="0.92"/>
+<text x="420.9" y="195" fill="#f8fafc" font-family="JetBrains Mono,monospace" font-size="14" font-weight="700">44.4%</text>
+<text x="146" y="247" text-anchor="end" fill="#cbd5e1" font-family="Inter,Arial" font-size="13">supermemory</text>
+<rect x="160" y="224" width="560" height="34" rx="9" fill="#111827"/>
+<rect x="160" y="224" width="560.0" height="34" rx="9" fill="#10b981" opacity="0.92"/>
+<text x="732.0" y="247" fill="#f8fafc" font-family="JetBrains Mono,monospace" font-size="14" font-weight="700">100.0%</text>
+<text x="146" y="299" text-anchor="end" fill="#cbd5e1" font-family="Inter,Arial" font-size="13">tandem</text>
+<rect x="160" y="276" width="560" height="34" rx="9" fill="#111827"/>
+<rect x="160" y="276" width="560.0" height="34" rx="9" fill="#38bdf8" opacity="0.92"/>
+<text x="732.0" y="299" fill="#f8fafc" font-family="JetBrains Mono,monospace" font-size="14" font-weight="700">100.0%</text>
+<text x="36" y="348" fill="#e2e8f0" font-family="Inter,Arial" font-size="17" font-weight="700">Retrieval support</text>
+<line x1="160" y1="373" x2="720" y2="373" stroke="#1f2937"/>
+<text x="146" y="400" text-anchor="end" fill="#cbd5e1" font-family="Inter,Arial" font-size="13">internal</text>
+<rect x="160" y="377" width="560" height="34" rx="9" fill="#111827"/>
+<rect x="160" y="377" width="186.6" height="34" rx="9" fill="#8b949e" opacity="0.92"/>
+<text x="358.6" y="400" fill="#f8fafc" font-family="JetBrains Mono,monospace" font-size="14" font-weight="700">33.3%</text>
+<text x="146" y="452" text-anchor="end" fill="#cbd5e1" font-family="Inter,Arial" font-size="13">supermemory</text>
+<rect x="160" y="429" width="560" height="34" rx="9" fill="#111827"/>
+<rect x="160" y="429" width="497.8" height="34" rx="9" fill="#10b981" opacity="0.92"/>
+<text x="669.8" y="452" fill="#f8fafc" font-family="JetBrains Mono,monospace" font-size="14" font-weight="700">88.9%</text>
+<text x="146" y="504" text-anchor="end" fill="#cbd5e1" font-family="Inter,Arial" font-size="13">tandem</text>
+<rect x="160" y="481" width="560" height="34" rx="9" fill="#111827"/>
+<rect x="160" y="481" width="497.8" height="34" rx="9" fill="#38bdf8" opacity="0.92"/>
+<text x="669.8" y="504" fill="#f8fafc" font-family="JetBrains Mono,monospace" font-size="14" font-weight="700">88.9%</text>
+<text x="36" y="386" fill="#64748b" font-family="Inter,Arial" font-size="12">Caveat: this is an AgentWASP-specific synthetic benchmark, not an official LongMemEval/LoCoMo leaderboard run.</text>
+</svg>
