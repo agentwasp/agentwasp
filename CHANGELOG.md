@@ -7,6 +7,10 @@ Versions: [SemVer](https://semver.org/). Full pre-OSS history (v2.3 → v2.6) li
 
 ## [Unreleased]
 
+### Fixed
+
+- **macOS installer still aborted before OS detection** (#1). The earlier macOS compatibility fix guarded Linux-only memory, disk, port, and Docker-group checks, but `install.sh` still sourced `/etc/os-release` unconditionally before reaching the Darwin branch. On a clean Mac, the missing file returned a non-zero status and `set -Eeuo pipefail` terminated the installer. The pre-flight now starts with safe `OS_ID`/`OS_LIKE` defaults and sources `/etc/os-release` only when it is readable. The repository checksum file is updated for the corrected script.
+
 ### Changed
 
 - **License: Business Source License 1.1 → Apache License 2.0.** WASP is now under standard permissive open-source terms. The previous BSL 1.1 + USD $1M annual revenue threshold + Change Date 2029-05-13 mechanism has been removed entirely. Apache 2.0 grants explicit patent rights from contributors, includes a patent retaliation clause, and reserves the "WASP" trademark to the project. Commercial use, redistribution, and modification are all permitted under standard Apache 2.0 terms. All prior contributions are relicensed under Apache 2.0; future contributions are accepted under the same terms.
@@ -16,7 +20,7 @@ Versions: [SemVer](https://semver.org/). Full pre-OSS history (v2.3 → v2.6) li
 
 ### Notes
 
-No runtime behavior changes. License (Apache 2.0) and docs/metadata only.
+Runtime services are unchanged. The only executable behavior change is the macOS installer pre-flight fix above; the remaining Unreleased entries affect licensing, documentation, and metadata.
 
 ## [2.7.2] — 2026-05-20 (installer hotfix)
 

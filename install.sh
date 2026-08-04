@@ -164,8 +164,15 @@ fi
 
 # ── [1/10] Pre-flight ──────────────────────────────────────────────────
 step "Pre-flight checks"
-OS_ID="$( . /etc/os-release 2>/dev/null && echo "${ID:-unknown}" )"
-OS_LIKE="$( . /etc/os-release 2>/dev/null && echo "${ID_LIKE:-}" )"
+# /etc/os-release is Linux-specific. Initialize safe defaults so `set -e`
+# cannot abort before the Darwin branch below is reached on macOS.
+OS_ID="unknown"
+OS_LIKE=""
+if [[ -r /etc/os-release ]]; then
+    . /etc/os-release
+    OS_ID="${ID:-unknown}"
+    OS_LIKE="${ID_LIKE:-}"
+fi
 
 # Pick the right package manager family up-front. Everything downstream goes
 # through pkg_update / pkg_install so we never hard-code apt-get (which
