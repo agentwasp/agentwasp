@@ -7,6 +7,10 @@ Versions: [SemVer](https://semver.org/). Full pre-OSS history (v2.3 → v2.6) li
 
 ## [Unreleased]
 
+### Fixed
+
+- **Docusaurus broken anchors.** Updated three stale cross-page links: temporal reasoning now targets the scheduler's current Cognitive systems section, and Skill Safety no longer uses obsolete `-v26` suffixes for the Cold-Start Hallucination Guard and Multi-URL Aggregator anchors.
+
 ### Changed
 
 - **License: Business Source License 1.1 → Apache License 2.0.** WASP is now under standard permissive open-source terms. The previous BSL 1.1 + USD $1M annual revenue threshold + Change Date 2029-05-13 mechanism has been removed entirely. Apache 2.0 grants explicit patent rights from contributors, includes a patent retaliation clause, and reserves the "WASP" trademark to the project. Commercial use, redistribution, and modification are all permitted under standard Apache 2.0 terms. All prior contributions are relicensed under Apache 2.0; future contributions are accepted under the same terms.

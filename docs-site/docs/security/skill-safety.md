@@ -156,11 +156,11 @@ When `should_retry=True`, the agent gets exactly one corrective LLM round with a
 
 ### Low-Intent Cold-Start Guard
 
-`events/handlers.py` lines 681–743. See [Sandboxing](/security/sandboxing#cold-start-hallucination-guard-v26).
+`events/handlers.py` lines 681–743. See [Sandboxing](/security/sandboxing#cold-start-hallucination-guard).
 
 ### Multi-URL Aggregator
 
-`events/handlers.py` ~line 5355. See [Sandboxing](/security/sandboxing#multi-url-aggregator-error-prefix-detection-v26).
+`events/handlers.py` ~line 5355. See [Sandboxing](/security/sandboxing#multi-url-aggregator-error-prefix-detection).
 
 ### Agent Name Preservation
 

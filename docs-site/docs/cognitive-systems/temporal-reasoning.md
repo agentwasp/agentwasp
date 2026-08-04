@@ -83,4 +83,4 @@ Notification rate-limited to 3/day; respects quiet hours (`quiet_hours_start_loc
 - [World Model](/cognitive-systems/world-model) — current snapshots
 - [Knowledge Graph](/core-concepts/knowledge-graph) — entity registry
 - [Memory](/core-concepts/memory) — overall memory layers
-- [Scheduler → perception](/core-concepts/scheduler#optional-jobs-not-auto-registered)
+- [Scheduler → perception](/core-concepts/scheduler#cognitive-systems)
