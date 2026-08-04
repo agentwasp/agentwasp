@@ -32,7 +32,7 @@ Returns JSON:
 ```json
 {
   "status": "ok",
-  "version": "2.7.2",
+  "version": "2.7.3",
   "components": {
     "model": {"status": "ok", "provider": "anthropic", "name": "claude-sonnet-4-6"},
     "redis": {"status": "ok"},

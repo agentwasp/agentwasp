@@ -8,7 +8,7 @@ description: Completed features and planned improvements for WASP.
 
 ## Current Status
 
-**Current Version: v2.7.2** (May 2026 — installer hotfix on top of v2.7.1)
+**Current Version: v2.7.3** (August 2026 — macOS installer hotfix)
 
 WASP is in active production deployment and now publishable as a self-hostable OSS project. All systems below are complete and operational.
 

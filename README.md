@@ -7,7 +7,7 @@
 Self-hosted autonomous agent runtime built around reliability. Truth-binding response layer, plan critic, capability tiers, knowledge graph and temporal world model, 10+ persistent memory tiers, 41 background jobs. Apache 2.0. Docker.
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-F5C542?style=flat-square)](LICENSE.md)
-[![Version](https://img.shields.io/badge/version-2.7.2-F5C542?style=flat-square)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.7.3-F5C542?style=flat-square)](CHANGELOG.md)
 [![Docs](https://img.shields.io/badge/docs-agentwasp.com-F5C542?style=flat-square)](https://docs.agentwasp.com)
 [![Install](https://img.shields.io/badge/install-1%20line-F5C542?style=flat-square)](#install)
 [![Python](https://img.shields.io/badge/python-3.12-F5C542?style=flat-square)](https://www.python.org)
